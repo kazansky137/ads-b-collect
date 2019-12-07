@@ -1,0 +1,37 @@
+# (c) Kazansky137 - Sat Dec  7 22:53:15 CET 2019
+
+# Airplanes of interest
+;   Air Belgium
+  civ : ic : 448441 : OO-ABA Air Belgium
+
+;   Air Belgium like tail number
+  gav : ic : 44844C : OO-ABC Dassault Falcon 7X
+
+;   Nato
+  mil : ic : 4D03C8 : LX-N90450 Boeing E3 Awacs
+
+;   Antonov
+  exc : ic : 50801F : UR-82072 An-124-100       # Damaged OST 2019/11/26
+
+;   Cavok
+  exc : ic : 508179 : Cavok UR-CJN Antonov An-12 TB
+
+# Belgian defence
+  mil : ic : 44C1EA : OO-POJ G-17                   : 900
+  mil : ic : 44F024 : FB-14  F-16BM Fighting Falcon : 900
+
+# Flights of interest
+;   Brussels Airlines (Long haul flights)
+  bru : cs : BEL371__ : BRU -> DLA/NSI
+  bru : cs : BEL372__ : NSI/DLA -> BRU
+
+;   Brussels Airlines A330
+; bru : ic : 44CCD5 : OO-SFU Brussels Airlines  # Damaged BRU 2019/11/23
+
+;   Dreaming flights
+  civ : cs : MAS1____ : LHR -> KUL
+  civ : cs : MAS2____ : KUL -> LHR
+
+# Squawks of interest
+# ecx : sq : 6001 : Check Belgian AF
+# ecx : sq : 6002 : Check Belgian AF

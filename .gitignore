@@ -1,0 +1,8 @@
+*.bak
+flights-*.txt
+log-*.txt
+messages-*.txt
+archives/
+aircrafts/
+config/*.txt
+__pycache__/

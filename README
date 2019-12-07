@@ -1,0 +1,46 @@
+# ads-b-collect
+
+# (c) Kazansky137 - Sat Dec  7 22:53:15 CET 2019
+
+Collect messages from ADS-B 
+---------------------------
+
+This work is greatly based on the library "pyModeS" of Junzi Sun.
+
+The 1090MHz Riddle - An open-access book about decoding Mode-S and ADS-B data
+	- https://mode-s.org/decode/
+    - https://github.com/junzis/the-1090mhz-riddle
+
+The Python Decoder for ADS-B (DF17) and Mode-S Comm-B (DF20/21)
+	- https://github.com/junzis/pyModeS
+
+pyModeS: Decoding Mode-S Surveillance Data for Open Air Transportation Research
+    - http://tiny.cc/19j1dz
+    - @article{sun2019pymodes,
+      author={J. {Sun} and H. {V\^u} and J. {Ellerbroek} and J. M. {Hoekstra}},
+      journal={IEEE Transactions on Intelligent Transportation Systems},
+      title={pyModeS: Decoding Mode-S Surveillance Data for
+             Open Air Transportation Research},
+      year={2019},
+      doi={10.1109/TITS.2019.2914770},
+      ISSN={1524-9050},
+      }
+
+ADS-B messages used in this project will be collected from sdfr[xy]
+Raspberry Pi's in the slashdev.be network :
+
+- sdfr241 - gbx-se : sdfr241-w.slashdev.be
+- sdfr242 - gbx-nw : sdfr242.slashdev.be
+- sdfr243 - lln-se : sheremetyevo.dyndns.org
+- sdfr244 - lln-nw : domodedovo.dyndns.org
+
+On each Raspberry, the dump1090-fa process is collecting raw ADS-B
+messages from USB 1090 MHz receivers ; "fa" stands from FligtAware
+as there should be different implementations of the dump1090 process.
+
+dump1090-fa open ports to read/write ADS-B messages in different format :
+- 30001 -     : TCP raw input listen port
+- 30002 -     : TCP raw output listen port
+- 30003 - sbs : TCP BaseStation output listen port
+- 30004 - bi  : TCP Beast input listen port
+- 30005 - bo  : TCP Beast output listen port
