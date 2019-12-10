@@ -1,7 +1,9 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Dec  7 22:53:15 CET 2019
+# (c) Kazansky137 - Tue Dec 10 22:43:01 CET 2019
 
+import io
+import os
 import sys
 from time import gmtime, strftime
 
@@ -15,10 +17,22 @@ def log(*args, _ts=None, _col=None, _file=sys.stderr, **kwargs):
         print("{:s} {:s}:".format(strftime("%d %H:%M:%S", _ts), sys.argv[0]),
               *args, **kwargs, file=_file)
     else:
+        string_io = io.StringIO()
         print("{:s} {:s}:".format(strftime("%d %H:%M:%S", _ts), sys.argv[0]),
-              file=_file, end=' ')
-        xt_set(*_col, _file=_file)
-        print(*args, **kwargs, end='', file=_file)
+              file=string_io, end=' ')
+        xt_set(*_col, _file=string_io)
+        print(*args, **kwargs, end='', file=string_io)
+
+        # /AKN - Tue Dec 10 22:22:26 CET 2019
+        # 1. Line padding in case of colored output should be moved
+        #    to xt_.... functions.
+        # 2. Should truncate line to xt_line_max
+        global xt_line_del, xt_line_max     # See comment AKN below
+        xt_line_pad = xt_line_max - (len(string_io.getvalue()) - xt_line_del)
+        print(xt_line_pad * ' ', end='', file=string_io)
+        print(string_io.getvalue(), end='', file=_file)
+        string_io.close()
+
         xt_reset(_file=_file)
     _file.flush()
 
@@ -58,23 +72,39 @@ xt_effects = {'end': 0, 'bold': 1, 'disable': 2, 'italic': 3,
 
 
 def xt_set(_fg='black', _bg=None, _st=None, _file=sys.stdout):
+    global xt_line_del, xt_line_max
+
+    try:
+        xt_line_del
+    except NameError:
+        xt_line_del = 0
+
+    try:
+        xt_line_max = int(os.environ['TERM_COLS'])
+    except KeyError:
+        xt_line_max = 120
+
     c_fg = 30 + xt_colors[_fg]
     if _bg is None and _st is None:             # FG
         print("\033[0;{:d}m".format(c_fg), end='', file=_file)
+        xt_line_del = xt_line_del + 7
     else:
         c_bg = 40 + xt_colors[_bg]
         if _st is None:                         # FG BG
             print("\033[0;{:d};{:d}m".format(c_fg, c_bg), end='', file=_file)
+            xt_line_del = xt_line_del + 10
         else:                                    # FG BG ST
             c_st = xt_effects[_st]
             print("\033[{:d};{:d};{:d}m".format(c_st, c_fg, c_bg),
                   end='', file=_file)
-
+            xt_line_del = xt_line_del + 10
     return
 
 
 def xt_reset(_file=sys.stdout):
+    global xt_line_del
     print("\033[0m", file=_file)
+    xt_line_del = 0
     return
 
 if __name__ == "__main__":
