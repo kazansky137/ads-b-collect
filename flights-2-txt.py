@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Dec  7 22:53:15 CET 2019
+# (c) Kazansky137 - Wed Dec 11 11:42:02 CET 2019
 
 import alert
 from common import log
@@ -70,6 +70,10 @@ class FlightList():
                             if alx is not None:
                                 alx.log(_ts)
                             return
+                        else:
+                            alx = self.alerts.check(_ic, _ts, _sq, _cs)
+                            if alx is not None:
+                                alx.log(_ts)
                     else:
                         flx.data['sq'] = _sq
                         alx = self.alerts.check(_ic, _ts, _sq, _cs)
@@ -78,7 +82,7 @@ class FlightList():
 
                 if _cs is not None:
                     if flx.data['cs'] is not None:
-                        if _cs is not None and flx.data['cs'] != _cs:
+                        if flx.data['cs'] != _cs:
                             new_fl = Flight(_ic, _ts, _sq, _cs)
                             # log("New flight from callsn", _cs, new_fl.data)
                             self.add(new_fl)
@@ -86,6 +90,10 @@ class FlightList():
                             if alx is not None:
                                 alx.log(_ts)
                             return
+                        else:
+                            alx = self.alerts.check(_ic, _ts, _sq, _cs)
+                            if alx is not None:
+                                alx.log(_ts)
                     else:
                         # log("Updated call sign", _cs)
                         flx.data['cs'] = _cs

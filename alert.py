@@ -1,10 +1,9 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Dec  7 22:53:15 CET 2019
+# (c) Kazansky137 - Wed Dec 11 11:42:02 CET 2019
 
 from common import log, load
 import sys
-from time import gmtime
 
 alert_cat = {'emg': ('yellow', 'red', 'blink'),
              'mil': ('red', 'green', 'bold'),
@@ -35,7 +34,7 @@ class Alert():
 class AlertList():
 
     def addpermanent(self):
-        self.add(Alert('emg', 'sq', 7700, "General Emergency", 60))
+        self.add(Alert('emg', 'sq', '7700', "General Emergency", 60))
 
     def __init__(self):
         self.list = []
