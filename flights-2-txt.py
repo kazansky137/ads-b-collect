@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Dec 11 11:42:02 CET 2019
+# (c) Kazansky137 - Thu Dec 12 20:48:07 UTC 2019
 
 import alert
 from common import log
 import sys
 import os
 import signal
-from time import gmtime, strftime
+from time import gmtime, strftime, time
 
 
 class Flight():
@@ -68,17 +68,17 @@ class FlightList():
                             self.add(new_fl)
                             alx = self.alerts.check(_ic, _ts, _sq, _cs)
                             if alx is not None:
-                                alx.log(_ts)
+                                alx.log(_ts, _ic)
                             return
                         else:
                             alx = self.alerts.check(_ic, _ts, _sq, _cs)
                             if alx is not None:
-                                alx.log(_ts)
+                                alx.log(_ts, _ic)
                     else:
                         flx.data['sq'] = _sq
                         alx = self.alerts.check(_ic, _ts, _sq, _cs)
                         if alx is not None:
-                            alx.log(_ts)
+                            alx.log(_ts, _ic)
 
                 if _cs is not None:
                     if flx.data['cs'] is not None:
@@ -88,18 +88,18 @@ class FlightList():
                             self.add(new_fl)
                             alx = self.alerts.check(_ic, _ts, _sq, _cs)
                             if alx is not None:
-                                alx.log(_ts)
+                                alx.log(_ts, _ic)
                             return
                         else:
                             alx = self.alerts.check(_ic, _ts, _sq, _cs)
                             if alx is not None:
-                                alx.log(_ts)
+                                alx.log(_ts, _ic)
                     else:
                         # log("Updated call sign", _cs)
                         flx.data['cs'] = _cs
                         alx = self.alerts.check(_ic, _ts, _sq, _cs)
                         if alx is not None:
-                            alx.log(_ts)
+                            alx.log(_ts, _ic)
 
                 flx.data['ls'] = float(_ts)
                 flx.data['nm'] = flx.data['nm'] + 1
@@ -112,10 +112,13 @@ class FlightList():
             # log("New flight", new_fl.data)
             alx = self.alerts.check(_ic, _ts, _sq, _cs)
             if alx is not None:
-                alx.log(_ts)
+                alx.log(_ts, _ic)
 
-        except:
-            pass
+        except Exception as e:
+            global cnt
+            log("Exception:", e)
+            log("         : Check input line {:10d}".format(cnt))
+
 
 if __name__ == "__main__":
 
@@ -123,12 +126,21 @@ if __name__ == "__main__":
 
     fl = FlightList()
 
+    global cnt
     cnt = 0
+    last_ct = 0
+    last_ts = time()
     for line in sys.stdin:
         cnt = cnt + 1
+
         # log("Read", line, end='')
         if cnt % 250000 == 0:
-            log("Running   : Read {:>12,d} messages".format(cnt))
+            dm = cnt - last_ct
+            dt = time() - last_ts
+            log("Running   : Read {:>12,d} messages ({:5d} /s)"
+                .format(cnt, int(dm/dt)))
+            last_ct = cnt
+            last_ts = time()
         words = line.split()
         if len(words) == 4:
             fl.addupd_flight(words[0], words[2], _sq=words[3])

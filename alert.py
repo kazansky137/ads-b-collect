@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Dec 11 11:42:02 CET 2019
+# (c) Kazansky137 - Thu Dec 12 20:48:07 UTC 2019
 
 from common import log, load
 import sys
@@ -26,8 +26,8 @@ class Alert():
     def message(self):
         return str(self.alert)
 
-    def log(self, _ts, _file=sys.stderr):
-        log("Alert {:s}".format(self.message()),
+    def log(self, _ts, _ic, _file=sys.stderr):
+        log("Alert: {:s} : {:s} ".format(_ic, self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
 
 
@@ -70,6 +70,7 @@ class AlertList():
                 # log("Matching   ",alert.message())
                 return alert
         return None
+
 
 if __name__ == "__main__":
 
