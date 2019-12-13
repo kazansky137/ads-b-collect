@@ -1,10 +1,11 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Dec 10 22:43:01 CET 2019
+# (c) Kazansky137 - Fri Dec 13 22:42:18 CET 2019
 
 import io
 import os
 import sys
+import re
 from time import gmtime, strftime
 
 
@@ -13,12 +14,13 @@ def log(*args, _ts=None, _col=None, _file=sys.stderr, **kwargs):
         _ts = gmtime(float(_ts))
     else:
         _ts = gmtime()
+    prog = re.search("[a-z]+", sys.argv[0]).group()
     if _col is None:
-        print("{:s} {:s}:".format(strftime("%d %H:%M:%S", _ts), sys.argv[0]),
+        print("{:s} {:s}:".format(strftime("%d %H:%M:%S", _ts), prog),
               *args, **kwargs, file=_file)
     else:
         string_io = io.StringIO()
-        print("{:s} {:s}:".format(strftime("%d %H:%M:%S", _ts), sys.argv[0]),
+        print("{:s} {:s}:".format(strftime("%d %H:%M:%S", _ts), prog),
               file=string_io, end=' ')
         xt_set(*_col, _file=string_io)
         print(*args, **kwargs, end='', file=string_io)
@@ -42,10 +44,10 @@ def load(_class, _filename, _type):
     with open(_filename, 'r') as f:
         for l in f.readlines():
             l, s, t = l.partition('#')      # main inline/outline comment sep.
-            l = l.strip(" \n\t")
-            if len(l) == 0 or l[0] in ";":  # ';' secondary outline comment
+            x = l.strip(" \n\t")
+            if len(x) == 0 or x[0] in ";":  # ';' secondary outline comment
                 continue
-            _class.add(_type(*tuple(w.strip() for w in l.split(':'))))
+            _class.add(_type(*tuple(w.strip() for w in x.split(':'))))
             cnt = cnt + 1
         f.close()
     return cnt
@@ -60,6 +62,7 @@ def xt_color_table():
                 s1 += '\x1b[%sm %s \x1b[0m' % (format, format)
             print(s1)
         print('\n')
+
 
 xt_colors = {'black': 0, 'red': 1, 'green': 2, 'yellow': 3,
              'blue': 4, 'magenta': 5, 'cyan': 6, 'white': 7
@@ -106,6 +109,7 @@ def xt_reset(_file=sys.stdout):
     print("\033[0m", file=_file)
     xt_line_del = 0
     return
+
 
 if __name__ == "__main__":
 
