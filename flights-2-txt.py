@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Dec 12 20:48:07 UTC 2019
+# (c) Kazansky137 - Sat Dec 14 18:17:05 CET 2019
 
 import alert
 from common import log
@@ -122,6 +122,16 @@ class FlightList():
 
 if __name__ == "__main__":
 
+    def handler_alarm(_signum, _frame):
+        global signal_alarm
+        signal_alarm = 1
+
+    global signal_alarm
+    signal.signal(signal.SIGALRM, handler_alarm)
+    signal_alarm = 0
+    period_alarm = 900
+    signal.alarm(period_alarm)
+
     log("Running: Pid {:5d}".format(os.getpid()))
 
     fl = FlightList()
@@ -129,18 +139,23 @@ if __name__ == "__main__":
     global cnt
     cnt = 0
     last_ct = 0
-    last_ts = time()
+    init_ts = time()
+    last_ts = init_ts
     for line in sys.stdin:
         cnt = cnt + 1
 
         # log("Read", line, end='')
-        if cnt % 250000 == 0:
+        if cnt % 250000 == 0 or signal_alarm == 1:
+            signal_alarm = 0
+            signal.alarm(period_alarm)
+
             dm = cnt - last_ct
             dt = time() - last_ts
             log("Running   : Read {:>12,d} messages ({:5d} /s)"
                 .format(cnt, int(dm/dt)))
             last_ct = cnt
             last_ts = time()
+
         words = line.split()
         if len(words) == 4:
             fl.addupd_flight(words[0], words[2], _sq=words[3])
@@ -150,6 +165,11 @@ if __name__ == "__main__":
 
     nmsgs = fl.print()
 
-    log("Terminated: Read {:>12,d} messages".format(nmsgs))
+    if nmsgs != cnt:
+        log("Terminated: error in counters FL {:>12,d} CT {:>12,d}"
+            .format(nmsgs, cnt))
+
+    log("Terminated: Read {:>12,d} messages ({:5d} /s)"
+        .format(cnt, int(cnt/(time() - init_ts))))
 
     sys.exit(0)
