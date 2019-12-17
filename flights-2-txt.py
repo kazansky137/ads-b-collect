@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Dec 14 18:17:05 CET 2019
+# (c) Kazansky137 - Tue Dec 17 16:48:02 CET 2019
 
 import alert
 from common import log
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     global signal_alarm
     signal.signal(signal.SIGALRM, handler_alarm)
     signal_alarm = 0
-    period_alarm = 900
+    period_alarm = 3600
     signal.alarm(period_alarm)
 
     log("Running: Pid {:5d}".format(os.getpid()))
@@ -145,7 +145,8 @@ if __name__ == "__main__":
         cnt = cnt + 1
 
         # log("Read", line, end='')
-        if cnt % 250000 == 0 or signal_alarm == 1:
+        cnt_alarm = 500000
+        if cnt % cnt_alarm == 0 or signal_alarm == 1:
             signal_alarm = 0
             signal.alarm(period_alarm)
 
@@ -166,8 +167,8 @@ if __name__ == "__main__":
     nmsgs = fl.print()
 
     if nmsgs != cnt:
-        log("Terminated: error in counters FL {:>12,d} CT {:>12,d}"
-            .format(nmsgs, cnt))
+        log("Terminated: Fail {:>12,d} cnt != {:>12,d} nmsgs"
+            .format(cnt, msgs))
 
     log("Terminated: Read {:>12,d} messages ({:5d} /s)"
         .format(cnt, int(cnt/(time() - init_ts))))

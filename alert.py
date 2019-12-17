@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Dec 12 20:48:07 UTC 2019
+# (c) Kazansky137 - Tue Dec 17 16:48:02 CET 2019
 
 from common import log, load
 import sys
 
-alert_cat = {'emg': ('yellow', 'red', 'blink'),
+alert_cat = {'urg': ('yellow', 'red', 'blink'),
              'mil': ('red', 'green', 'bold'),
              'bru': ('blue', 'yellow', 'bold'),
              'civ': ('blue', 'white', 'bold'),
@@ -34,7 +34,7 @@ class Alert():
 class AlertList():
 
     def addpermanent(self):
-        self.add(Alert('emg', 'sq', '7700', "General Emergency", 60))
+        self.add(Alert('urg', 'sq', '7700', "General Emergency", 60))
 
     def __init__(self):
         self.list = []
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     """
     log("Alert Std")
-    log("Alert Emg", _col=alert_cat['emg'])
+    log("Alert Urg", _col=alert_cat['urg'])
     log("Alert Mil", _col=alert_cat['mil'])
     log("Alert Bru", _col=alert_cat['bru'])
     log("Alert Civ", _col=alert_cat['civ'])
