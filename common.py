@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Dec 13 22:42:18 CET 2019
+# (c) Kazansky137 - Tue Dec 17 21:14:07 UTC 2019
 
 import io
 import os
@@ -48,6 +48,21 @@ def load(_class, _filename, _type):
             if len(x) == 0 or x[0] in ";":  # ';' secondary outline comment
                 continue
             _class.add(_type(*tuple(w.strip() for w in x.split(':'))))
+            cnt = cnt + 1
+        f.close()
+    return cnt
+
+
+def load_config(_dict, _filename):
+    cnt = 0
+    with open(_filename, 'r') as f:
+        for l in f.readlines():
+            l, s, t = l.partition('#')      # main inline/outline comment sep.
+            x = l.strip(" \n\t")
+            if len(x) == 0 or x[0] in ";":  # ';' secondary outline comment
+                continue
+            k, v = x.split(':')
+            _dict[k.strip(' ')] = v.strip(' ')
             cnt = cnt + 1
         f.close()
     return cnt
