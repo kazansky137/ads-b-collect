@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Tue Dec 17 16:48:02 CET 2019
+# (c) Kazansky137 - Tue Dec 17 16:57:11 CET 2019
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -9,4 +9,5 @@
 2019 Dec 12 12:48 : devout - fd13d23 : Updated log output with ICAO, add rates
 2019 Dec 13 22:42 : devout - 141c34d : Updated log output, pep8 compliant
 2019 Dec 14 18:17 : devout - 06189df : Updated log output, Added run-file.sh
-2019 Dec 17 16:48 : devout -         : Changed emg to urg. Increased cnt period
+2019 Dec 17 16:48 : devout - bd4cf84 : Changed emg to urg. Increased cnt period
+2019 Dec 17 16:57 : devout -         : Updated config/alerts.txt file
