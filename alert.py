@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Dec 17 16:48:02 CET 2019
+# (c) Kazansky137 - Tue Dec 17 21:19:26 CET 2019
 
 from common import log, load
 import sys
@@ -68,6 +68,7 @@ class AlertList():
                (alert.alert[1] == 'cs' and alert.alert[2] == _cs)):
                 alert.fs = _ts
                 # log("Matching   ",alert.message())
+                alert.log(_ts, _ic)
                 return alert
         return None
 
