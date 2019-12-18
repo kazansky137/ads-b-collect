@@ -1,9 +1,10 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Dec 17 21:19:26 CET 2019
+# (c) Kazansky137 - Wed Dec 18 17:04:03 CET 2019
 
 from common import log, load
 import sys
+import ringring
 
 alert_cat = {'urg': ('yellow', 'red', 'blink'),
              'mil': ('red', 'green', 'bold'),
@@ -19,6 +20,7 @@ class Alert():
     def __init__(self, _cat, _trigger, _val, _com=None, _validity=3600):
         self.alert = (_cat, _trigger, _val, _com, int(_validity))
         self.fs = 0
+        self.ring = ringring.RingRing()
 
     def print(self, _file=sys.stdout):
         print(self.alert, self.fs, file=_file)
@@ -29,6 +31,9 @@ class Alert():
     def log(self, _ts, _ic, _file=sys.stderr):
         log("Alert: {:s} : {:s} ".format(_ic, self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
+        if self.alert[0] == "urg":
+            self.ring.send("{:s} {:s}\n{:s}"
+                           .format(_ic, self.alert[2], self.alert[3]))
 
 
 class AlertList():

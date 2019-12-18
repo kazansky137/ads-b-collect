@@ -1,0 +1,17 @@
+# (c) Kazansky137 - Wed Dec 18 17:04:03 CET 2019
+
+# Syntax
+#	cat : trigger : value : message [: validity]
+#
+#	cat values:
+#	 	urg, mil, bru, civ, gav, exc
+#	trigger values:
+# 		ic, cs, sq
+
+# Examples
+# urg : ic : 40631F : U28973 LGW -> SOF         # Dec 11 Diverted BRU SQ 7700
+# mil : ic : 44C1E3 : OO-POC G-14 MD 520N Explorer : 900
+# bru : cs : BEL371__ : BRU -> DLA/NSI
+# civ : cs : MAS1____ : LHR -> KUL
+# gav : ic : 44844C : OO-ABC Dassault Falcon 7X
+# exc : ic : 50801F : UR-82072 An-124-100

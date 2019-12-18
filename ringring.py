@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Dec 17 21:14:07 UTC 2019
+# (c) Kazansky137 - Wed Dec 18 17:04:03 CET 2019
 
 import sys
 import requests
@@ -15,20 +15,23 @@ class RingRing():
         return
 
     def send(self, _msg):
+        _msg = self.params["prefix"] + " \n" + _msg
         values = {"apiKey":     self.params["apiKey"],
                   "to":         self.params["to"],
                   "message":    _msg
                   }
-        r = requests.post("https://api.ringring.be/sms/sandbox/message",
+        r = requests.post("https://api.ringring.be/sms/v1/message",
                           json=values)
         log("Return code", r.status_code, r.json()['ResultDescription'])
         return
 
+    def phone(self):
+        return self.params["to"]
 
 if __name__ == "__main__":
 
     rr = RingRing()
 
-    rr.send("ADS-B ALERT: AABBCC: OO-SFU Brussels Airlines")
+    rr.send("44CCD5\nOO-SFU Brussels Airlines")
 
     sys.exit(0)

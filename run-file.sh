@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# (c) Kazansky137 - Tue Dec 17 21:19:26 CET 2019
+# (c) Kazansky137 - Wed Dec 18 17:04:03 CET 2019
 
   if [ $# -ne 1 ]; then
     echo Usage: $0 file.txt[.gz]
@@ -33,6 +33,16 @@
 # Various output files
   flgfile=flights-${BASH_REMATCH[2]}.txt
   runfile=log-${BASH_REMATCH[2]}.txt
+
+  if [ -e $flgfile ]; then
+    echo $0: file $flgfile is already existing
+    exit 1
+  fi
+
+  if [ -e $runfile ]; then
+    echo $0: file $runfile is already existing
+    exit 1
+  fi
 
 # Environment variable for nice justified colored output
   export TERM_COLS=$(tput cols)

@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Tue Dec 17 21:14:07 UTC 2019
+# (c) Kazansky137 - Wed Dec 18 17:04:03 CET 2019
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -12,4 +12,5 @@
 2019 Dec 17 16:48 : devout - bd4cf84 : Changed emg to urg. Increased cnt period
 2019 Dec 17 16:57 : devout - a7fadef : Updated config/alerts.txt file
 2019 Dec 17 21:19 : devout - 3404135 : Moved log alert from flights-2 to alert
-2019 Dec 17 22:14 : devout -         : Added ringring feature to send SMS
+2019 Dec 17 22:14 : devout - 4dfa825 : Added ringring feature to send SMS
+2019 Dec 18 17:04 : devout -         : Integrated ringring to alert.py
