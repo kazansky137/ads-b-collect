@@ -1,5 +1,0 @@
-# (c) Kazansky137 - Tue Dec 17 21:14:07 UTC 2019
-
-apiKey : 8325BF10-59D2-423B-B2EF-43AB2AA6229F
-to     : 0475/56.58.76
-prefix : ADS-B ALERT

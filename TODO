@@ -1,11 +1,14 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Tue Dec 17 21:19:26 CET 2019
+# (c) Kazansky137 - Thu Dec 19 15:18:08 CET 2019
 
 General
 -------
 Alerting : Should add alert for missing flights after some delay.
-Alerting : Should add media like Telegram, SMS or mobile app.
+Alerting : Should add media like Telegram or mobile app.
+
+Config : Should validate config files (e.g. ';' instead of ':', case of letters)
+Config : Should manage to reload line icao-tail.txt
 
 common.py
 ---------

@@ -4,5 +4,6 @@ log-*.txt
 messages-*.txt
 archives/
 aircrafts/
-config/*.txt
+config/alerts.txt
+config/ringring.txt
 __pycache__/
