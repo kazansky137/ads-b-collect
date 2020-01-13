@@ -1,13 +1,12 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Dec 19 15:18:08 CET 2019
+# (c) Kazansky137 - Mon Jan 13 19:59:17 CET 2020
 
 import alert
 from common import log
 import sys
 import os
 import signal
-import ringring
 from time import gmtime, strftime, time
 import importlib
 icaocodes = importlib.import_module("icao-codes")
@@ -34,7 +33,6 @@ class Flight():
 
 class FlightList():
     codes = icaocodes.IcaoCodes()
-    ring = ringring.RingRing()
 
     def handler_hup(self, _signum, _frame):
         self.signal_hup = 1

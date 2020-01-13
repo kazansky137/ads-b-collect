@@ -1,10 +1,11 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Jan 13 19:43:17 CET 2020
+# (c) Kazansky137 - Mon Jan 13 19:59:17 CET 2020
 
 from common import log, load
 import sys
 import sendmail
+import ringring
 import importlib
 flightlist = importlib.import_module("flights-2-txt")
 
@@ -21,6 +22,7 @@ class Alert():
 
     def __init__(self, _cat, _trigger, _val, _com=None, _validity=3600):
         self.mail = sendmail.SendMail()
+        self.ring = ringring.RingRing()
         self.alert = (_cat, _trigger, _val, _com, int(_validity))
         self.fs = 0
 
@@ -36,8 +38,7 @@ class Alert():
         log("Alert: {:s} : {:s} : {:s} ".format(_ic, tail, self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
         if self.alert[0] == "urg":
-            ring = flightlist.FlightList.ring
-            ring.send("{:s} {:s}\n{:s}"
+            self.ring.send("{:s} {:s}\n{:s}"
                       .format(_ic, tail, self.alert[3]))
 
 
