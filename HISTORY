@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Thu Jan  9 22:28:13 CET 2020
+# (c) Kazansky137 - Mon Jan 13 19:43:17 CET 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -15,4 +15,5 @@
 2019 Dec 17 22:14 : devout - 4dfa825 : Added ringring feature to send SMS
 2019 Dec 18 17:04 : devout - 8c4a917 : Integrated ringring to alert.py
 2019 Dec 19 15:18 : devout - 10a7c92 : Added icao-codes to add tail n° in SMS.
-2020 Jan 09 22:26 : devout -         : Updated config/icao-tail.txt.
+2020 Jan 09 22:26 : devout - 0d8a297 : Updated config/icao-tail.txt.
+2020 Jan 13 19:44 : devout -         : Added email alerting.

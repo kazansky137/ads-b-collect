@@ -6,4 +6,5 @@ archives/
 aircrafts/
 config/alerts.txt
 config/ringring.txt
+config/sendmail.txt
 __pycache__/

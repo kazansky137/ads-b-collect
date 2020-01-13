@@ -1,9 +1,10 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Dec 19 15:18:08 CET 2019
+# (c) Kazansky137 - Mon Jan 13 19:43:17 CET 2020
 
 from common import log, load
 import sys
+import sendmail
 import importlib
 flightlist = importlib.import_module("flights-2-txt")
 
@@ -19,6 +20,7 @@ alert_cat = {'urg': ('yellow', 'red', 'blink'),
 class Alert():
 
     def __init__(self, _cat, _trigger, _val, _com=None, _validity=3600):
+        self.mail = sendmail.SendMail()
         self.alert = (_cat, _trigger, _val, _com, int(_validity))
         self.fs = 0
 
@@ -29,10 +31,11 @@ class Alert():
         return str(self.alert)
 
     def log(self, _ts, _ic, _file=sys.stderr):
-        log("Alert: {:s} : {:s} ".format(_ic, self.message()),
+        tail = flightlist.FlightList.codes.tail(_ic)
+        self.mail.send("Alert: {:s} : {:s}".format(_ic, tail),self.message())
+        log("Alert: {:s} : {:s} : {:s} ".format(_ic, tail, self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
         if self.alert[0] == "urg":
-            tail = flightlist.FlightList.codes.tail(_ic)
             ring = flightlist.FlightList.ring
             ring.send("{:s} {:s}\n{:s}"
                       .format(_ic, tail, self.alert[3]))
@@ -85,6 +88,10 @@ if __name__ == "__main__":
     """
     alert_list = AlertList()
     alert_list.print()
+    alert_list.check('IC0001',0,None,None)
+    alert_list.check('IC0002',0,'SQ0002',None)
+    alert_list.check('IC0003',0,None,'CS0003')
+    alert_list.check('IC0004',0,None,'CS0004')
     """
 
     """
