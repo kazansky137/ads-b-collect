@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Dec 13 22:42:18 CET 2019
+# (c) Kazansky137 - Mon Mar 16 21:41:12 UTC 2020
 
 import sys
 import os
@@ -98,6 +98,12 @@ class MyClient(TcpClient):
                     .format(self.msgs_last_short, int(delta_short)))
 
             self.msgs_curr_total = self.msgs_curr_total + 1
+
+            if( len(msg) == 26 or len(msg) == 40 ):
+            # Some version of dump1090 have the 12 first characters used with
+            # some date (timestamp ?). E.g. sdbr245 feeding flightradar24.
+            # Strip 12 first characters.
+                msg = msg[12:]
 
             if len(msg) < 28:        # Message length 112 bits
                 self.msgs_curr_short = self.msgs_curr_short + 1
