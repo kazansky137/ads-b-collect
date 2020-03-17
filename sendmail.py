@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Jan 13 19:43:17 CET 2020
+# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
 
 import sys
 import os
@@ -27,6 +27,7 @@ class SendMail():
         msg.set_content(_msg)
         smtp.send_message(msg)
         smtp.quit()
+
 
 if __name__ == "__main__":
 

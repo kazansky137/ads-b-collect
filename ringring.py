@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Dec 18 17:04:03 CET 2019
+# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
 
 import sys
 import requests
@@ -27,6 +27,7 @@ class RingRing():
 
     def phone(self):
         return self.params["to"]
+
 
 if __name__ == "__main__":
 

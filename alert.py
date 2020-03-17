@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Jan 13 19:59:17 CET 2020
+# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
 
 from common import log, load
 import sys
@@ -34,12 +34,12 @@ class Alert():
 
     def log(self, _ts, _ic, _file=sys.stderr):
         tail = flightlist.FlightList.codes.tail(_ic)
-        self.mail.send("Alert: {:s} : {:s}".format(_ic, tail),self.message())
+        self.mail.send("Alert: {:s} : {:s}".format(_ic, tail), self.message())
         log("Alert: {:s} : {:s} : {:s} ".format(_ic, tail, self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
         if self.alert[0] == "urg":
             self.ring.send("{:s} {:s}\n{:s}"
-                      .format(_ic, tail, self.alert[3]))
+                           .format(_ic, tail, self.alert[3]))
 
 
 class AlertList():

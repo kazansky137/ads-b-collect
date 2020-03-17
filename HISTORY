@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Mon Jan 13 19:59:17 CET 2020
+# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -19,4 +19,5 @@
 2020 Jan 13 19:44 : devout - 422ccfa : Added email alerting.
 2020 Jan 13 19:59 : devout - 4909ee1 : Moved ringring from flights-2 to alert
 2020 Mar 15 19:23 : devout - 288f8d5 : Updated config/icao-tail.txt.
-2020 Mar 16 22:41 : devout -         : Now decode msgs from fr24 dump1090
+2020 Mar 16 22:41 : master - b5c3973 : Now decode msgs from fr24 dump1090
+2020 Mar 17 19:03 : master -         : Made pep8 v2.3.1 compliant.
