@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Jan 13 19:59:17 CET 2020
+# (c) Kazansky137 - Sun Mar 22 18:27:31 UTC 2020
 
 import alert
 from common import log
@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
             dm = cnt - last_ct
             dt = time() - last_ts
-            log("Running   : Read {:>12,d} messages ({:5d} /s)"
+            log("Running   : Processed {:>12,d} messages ({:5d} /s)"
                 .format(cnt, int(dm/dt)))
             last_ct = cnt
             last_ts = time()
@@ -160,7 +160,7 @@ if __name__ == "__main__":
         log("Terminated: Fail {:>12,d} cnt != {:>12,d} nmsgs"
             .format(cnt, nmsgs))
 
-    log("Terminated: Read {:>12,d} messages ({:5d} /s)"
+    log("Terminated: Processed {:>12,d} messages ({:5d} /s)"
         .format(cnt, int(cnt/(time() - init_ts))))
 
     sys.exit(0)

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
+# (c) Kazansky137 - Sun Mar 22 18:27:31 UTC 2020
 
 import sys
 import os
@@ -12,6 +12,7 @@ from time import time
 
 import pyModeS as pms
 from pyModeS.extra.tcpclient import TcpClient
+from discover import Discover
 
 
 class MyClient(TcpClient):
@@ -24,18 +25,7 @@ class MyClient(TcpClient):
     def __init__(self, _host, _port, _datatype):
         TcpClient.__init__(self, _host, _port, _datatype)
 
-        # Message counters
-        self.msgs_curr_total = 0
-        self.msgs_curr_len28 = 0
-        self.msgs_curr_short = 0
-
-        self.msgs_last_total = 0
-        self.msgs_last_len28 = 0
-        self.msgs_last_short = 0
-
-        # Time counters
-        self.t_curr = time()
-        self.t_last = time()
+        self.discover = Discover()
 
         # Signals handling
         self.signal_hup = 0
@@ -64,40 +54,18 @@ class MyClient(TcpClient):
 
     def handle_messages(self, _messages):
         for msg, ts in _messages:
+            self.discover.message(msg)
+
             # Exit on SIGINT
             if self.signal_int == 1:
+                self.signal_int = 0
+                self.discover.logstat()
                 sys.exit(1)
 
             # Printout of statistics
             if self.signal_hup == 1:
                 self.signal_hup = 0
-
-                # Time
-                self.t_last = self.t_curr
-                self.t_curr = time()
-                self.t_diff = self.t_curr - self.t_last
-
-                # Messages
-                delta_total = self.msgs_curr_total - self.msgs_last_total
-                delta_len28 = self.msgs_curr_len28 - self.msgs_last_len28
-                delta_short = self.msgs_curr_short - self.msgs_last_short
-
-                delta_total = int(delta_total / self.t_diff)
-                delta_len28 = int(delta_len28 / self.t_diff)
-                delta_short = int(delta_short / self.t_diff)
-
-                self.msgs_last_total = self.msgs_curr_total
-                self.msgs_last_len28 = self.msgs_curr_len28
-                self.msgs_last_short = self.msgs_curr_short
-
-                log("Running   : Read {:>12,d} messages ({:5d} /s)"
-                    .format(self.msgs_last_total, int(delta_total)))
-                log("Running   : Read {:>12,d} msglen28 ({:5d} /s)"
-                    .format(self.msgs_last_len28, int(delta_len28)))
-                log("Running   : Read {:>12,d} msgshort ({:5d} /s)"
-                    .format(self.msgs_last_short, int(delta_short)))
-
-            self.msgs_curr_total = self.msgs_curr_total + 1
+                self.discover.logstat()
 
             if(len(msg) == 26 or len(msg) == 40):
                 # Some version of dump1090 have the 12 first characters used w/
@@ -106,10 +74,7 @@ class MyClient(TcpClient):
                 msg = msg[12:]
 
             if len(msg) < 28:        # Message length 112 bits
-                self.msgs_curr_short = self.msgs_curr_short + 1
                 continue
-
-            self.msgs_curr_len28 = self.msgs_curr_len28 + 1
 
             dfmt = pms.df(msg)
             icao = pms.icao(msg)
