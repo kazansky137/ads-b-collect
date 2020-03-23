@@ -1,11 +1,45 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sun Mar 22 18:27:31 UTC 2020
+# (c) Kazansky137 - Mon Mar 23 23:40:49 UTC 2020
 
 import sys
 import os
 from time import time
 from common import log
+import pyModeS.decoder.common as pms
+
+tc_txt = ["Aircraft identification",                   # 01
+          "Aircraft identification",                   # 02
+          "Aircraft identification",                   # 03
+          "Aircraft identification",                   # 04
+          "Surface position",                          # 05
+          "Surface position",                          # 06
+          "Surface position",                          # 07
+          "Surface position",                          # 08
+          "Airborne position (w/ Baro Altitude)",      # 09
+          "Airborne position (w/ Baro Altitude)",      # 10
+          "Airborne position (w/ Baro Altitude)",      # 11
+          "Airborne position (w/ Baro Altitude)",      # 12
+          "Airborne position (w/ Baro Altitude)",      # 13
+          "Airborne position (w/ Baro Altitude)",      # 14
+          "Airborne position (w/ Baro Altitude)",      # 15
+          "Airborne position (w/ Baro Altitude)",      # 16
+          "Airborne position (w/ Baro Altitude)",      # 17
+          "Airborne position (w/ Baro Altitude)",      # 18
+          "Airborne velocities",                       # 19
+          "Airborne position (w/ GNSS Height)",        # 20
+          "Airborne position (w/ GNSS Height)",        # 21
+          "Airborne position (w/ GNSS Height)",        # 22
+          "Reserved",                                  # 23
+          "Reserved",                                  # 24
+          "Reserved",                                  # 25
+          "Reserved",                                  # 26
+          "Reserved",                                  # 27
+          "Aircraft status",                           # 28
+          "Target state and status information",       # 29
+          "",                                          # 30
+          "Aircraft operation status"                  # 31
+          ]
 
 
 class Discover:
@@ -18,6 +52,15 @@ class Discover:
         self.msgs_last_total = 0
         self.msgs_last_len28 = 0
         self.msgs_last_short = 0
+
+        self.downlink_format = [0] * 32     # 5 bits  1 ..  5
+        self.ads_b_type_code = [0] * 32     # 5 bits 33 .. 37
+
+        self.parity_check_ok = 0
+        self.parity_check_ko = 0
+
+        self.check_legacy_ok = 0
+        self.check_legacy_ko = 0
 
         # Time counters
         self.t_curr = time()
@@ -37,6 +80,23 @@ class Discover:
             return
 
         self.msgs_curr_len28 = self.msgs_curr_len28 + 1
+
+        if pms.crc(msg) == 0:
+            self.parity_check_ok = self.parity_check_ok + 1
+        else:
+            self.parity_check_ko = self.parity_check_ko + 1
+
+        if pms.crc_legacy(msg) == 0:
+            self.check_legacy_ok = self.check_legacy_ok + 1
+        else:
+            self.check_legacy_ko = self.check_legacy_ko + 1
+
+        dfmt = pms.df(msg)
+        self.downlink_format[dfmt] = self.downlink_format[dfmt] + 1
+
+        if dfmt == 17 or dfmt == 18:    # Downlink format 17 or 18
+            tc = pms.typecode(msg)
+            self.ads_b_type_code[tc] = self.ads_b_type_code[tc] + 1
 
         return
 
@@ -65,6 +125,31 @@ class Discover:
             .format(self.msgs_last_len28, int(delta_len28)))
         log("Running   : Raw Read  {:>12,d} msgshort ({:5d} /s)"
             .format(self.msgs_last_short, int(delta_short)))
+
+        log("Running   : Raw Read  {:>12,d} check ok"
+            .format(self.parity_check_ok))
+        log("Running   : Raw Read  {:>12,d} check ko"
+            .format(self.parity_check_ko))
+
+        log("Running   : Raw Read  {:>12,d} check legacy ok"
+            .format(self.check_legacy_ok))
+        log("Running   : Raw Read  {:>12,d} check legacy ko"
+            .format(self.check_legacy_ko))
+
+        for i in range(len(self.downlink_format)):
+            v = self.downlink_format[i]
+            if v > 0:
+                log("Running   : Raw Read  {:>12,d} dfmt[{:2d}]"
+                    .format(v, i))
+
+        s = 0
+        for i in range(len(self.ads_b_type_code)):
+            v = self.ads_b_type_code[i]
+            if v > 0:
+                s = s + v
+                log("Running   : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
+                    .format(v, i, tc_txt[i-1]))
+        log("Running   : Raw Read  {:>12,d} tc17 cnt".format(s))
 
 
 if __name__ == "__main__":

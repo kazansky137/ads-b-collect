@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sun Mar 22 18:27:31 UTC 2020
+# (c) Kazansky137 - Mon Mar 23 23:40:49 UTC 2020
 
 import sys
 import os
@@ -81,6 +81,10 @@ class MyClient(TcpClient):
 
             # Aircraft identification
             if dfmt == 17 or dfmt == 18:    # Downlink format 17 or 18
+
+                if pms.crc(msg) != 0:
+                    continue
+
                 tc = pms.typecode(msg)
                 if tc == 4:          # Type code
                     cs = pms.adsb.callsign(msg)
