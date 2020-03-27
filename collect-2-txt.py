@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Mar 23 23:40:49 UTC 2020
+# (c) Kazansky137 - Fri Mar 27 19:00:00 UTC 2020
 
 import sys
 import os
@@ -54,7 +54,8 @@ class MyClient(TcpClient):
 
     def handle_messages(self, _messages):
         for msg, ts in _messages:
-            self.discover.message(msg)
+            if self.discover.message(msg) < 0:
+                continue
 
             # Exit on SIGINT
             if self.signal_int == 1:
@@ -72,9 +73,6 @@ class MyClient(TcpClient):
                 # some date (timestamp ?). E.g. sdbr245 feeding flightradar24.
                 # Strip 12 first characters.
                 msg = msg[12:]
-
-            if len(msg) < 28:        # Message length 112 bits
-                continue
 
             dfmt = pms.df(msg)
             icao = pms.icao(msg)

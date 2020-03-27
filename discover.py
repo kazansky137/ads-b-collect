@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Mar 23 23:40:49 UTC 2020
+# (c) Kazansky137 - Fri Mar 27 19:00:00 UTC 2020
 
 import sys
 import os
@@ -67,9 +67,10 @@ class Discover:
         self.t_last = time()
 
     def message(self, msg):
+        ret = 0
         self.msgs_curr_total = self.msgs_curr_total + 1
 
-        if(len(msg) == 26 or len(msg) == 40):
+        if len(msg) == 26 or len(msg) == 40:
             # Some version of dump1090 have the 12 first characters used w/
             # some date (timestamp ?). E.g. sdbr245 feeding flightradar24.
             # Strip 12 first characters.
@@ -77,7 +78,7 @@ class Discover:
 
         if len(msg) < 28:        # Message length 112 bits
             self.msgs_curr_short = self.msgs_curr_short + 1
-            return
+            return -1
 
         self.msgs_curr_len28 = self.msgs_curr_len28 + 1
 
@@ -98,7 +99,7 @@ class Discover:
             tc = pms.typecode(msg)
             self.ads_b_type_code[tc] = self.ads_b_type_code[tc] + 1
 
-        return
+        return ret
 
     def logstat(self):
         # Time
@@ -153,6 +154,18 @@ class Discover:
 
 
 if __name__ == "__main__":
+
     log("Running: Pid {:5d}".format(os.getpid()))
+
+    disc = Discover()
+    cnt = 0
+
+    for line in sys.stdin:
+        cnt = cnt + 1
+        # log("Read", line, end='')
+        words = line.split()
+        disc.message(words[1])
+
+    disc.logstat()
 
     sys.exit(0)
