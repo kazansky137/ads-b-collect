@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Fri Mar 27 19:00:00 UTC 2020
+# (c) Kazansky137 - Thu Apr  2 20:30:41 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -23,4 +23,5 @@
 2020 Mar 17 19:03 : master - 8b402b1 : Made pep8 v2.3.1 compliant.
 2020 Mar 18 19:27 : devpos - 1d6c312 : Moved raw statistics to Discover
 2020 Mar 24 00:42 : devpos - 01f99c5 : Added stats for crc, dfmt, tc28...
-2020 Mar 27 20:00 : devpos -         : Moved "bad" message in discover.py
+2020 Mar 27 20:00 : devpos - 399d46c : Moved "bad" message in discover.py
+2020 Apr 03 22:15 : devpos -         : Moved catxt to common. message return dict

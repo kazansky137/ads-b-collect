@@ -1,12 +1,13 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Mar 27 19:00:00 UTC 2020
+# (c) Kazansky137 - Thu Apr  2 20:30:41 UTC 2020
 
 import sys
 import os
 from time import time
-from common import log
-import pyModeS.decoder.common as pms
+from common import log, catxt
+import pyModeS as pms
+
 
 tc_txt = ["Aircraft identification",                   # 01
           "Aircraft identification",                   # 02
@@ -67,7 +68,8 @@ class Discover:
         self.t_last = time()
 
     def message(self, msg):
-        ret = 0
+        ret_dict = {}
+
         self.msgs_curr_total = self.msgs_curr_total + 1
 
         if len(msg) == 26 or len(msg) == 40:
@@ -78,7 +80,8 @@ class Discover:
 
         if len(msg) < 28:        # Message length 112 bits
             self.msgs_curr_short = self.msgs_curr_short + 1
-            return -1
+            ret_dict['ret'] = -1
+            return ret_dict
 
         self.msgs_curr_len28 = self.msgs_curr_len28 + 1
 
@@ -95,11 +98,19 @@ class Discover:
         dfmt = pms.df(msg)
         self.downlink_format[dfmt] = self.downlink_format[dfmt] + 1
 
-        if dfmt == 17 or dfmt == 18:    # Downlink format 17 or 18
+        ret_dict['ic'] = pms.icao(msg)
+
+        if dfmt in [17, 18]:    # Downlink format 17 or 18
             tc = pms.typecode(msg)
             self.ads_b_type_code[tc] = self.ads_b_type_code[tc] + 1
+            if tc == 4:
+                ret_dict['cs'] = pms.adsb.callsign(msg)
+                ret_dict['ca'] = catxt(msg)
+        elif dfmt in [5, 21]:
+                ret_dict['sq'] = pms.idcode(msg)
 
-        return ret
+        ret_dict['ret'] = 0
+        return ret_dict
 
     def logstat(self):
         # Time

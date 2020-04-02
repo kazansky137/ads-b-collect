@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Mar 27 19:00:00 UTC 2020
+# (c) Kazansky137 - Thu Apr  2 20:30:41 UTC 2020
 
 import sys
 import os
 import signal
 import atexit
 
-from common import log
+from common import log, catxt
 from time import time
 
 import pyModeS as pms
@@ -33,28 +33,10 @@ class MyClient(TcpClient):
         signal.signal(signal.SIGHUP, self.handler_hup)
         signal.signal(signal.SIGINT, self.handler_int)
 
-    def ca(self, _msg):
-        """
-        0 : No ADS-B Emitter Category Information
-        1 : Light < 15500 lbs.
-        2 : Small   15500 to  75000 lbs.
-        3 : Large   75000 to 300000 lbs.
-        4 : High Vortex Large (aircraft such as B-757)
-        5 : Heavy > 300000 lbs.
-        6 : High Performance > 5 g acceleration and > 400 kts
-        7 : Rotorcraft
-        """
-        dfbin = pms.hex2bin(_msg[:2])
-        return pms.bin2int(dfbin[5:8])
-
-    def catxt(self, _msg):
-        ca = ['None ', 'Light', 'Small', 'Large',
-              'HVort', 'Heavy', 'HPerf', 'Rotor']
-        return ca[self.ca(_msg)]
-
     def handle_messages(self, _messages):
         for msg, ts in _messages:
-            if self.discover.message(msg) < 0:
+            # log(self.discover.message(msg))
+            if self.discover.message(msg)['ret'] < 0:
                 continue
 
             # Exit on SIGINT
@@ -86,7 +68,7 @@ class MyClient(TcpClient):
                 tc = pms.typecode(msg)
                 if tc == 4:          # Type code
                     cs = pms.adsb.callsign(msg)
-                    ca = self.catxt(msg)
+                    ca = catxt(msg)
                     print("{:15.9f} {:s} {:s} {:s} {:s}".format
                           (ts, msg, icao, ca, cs), flush=True)
             elif dfmt in [5, 21]:
