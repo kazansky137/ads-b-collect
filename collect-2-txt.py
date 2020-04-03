@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Apr  2 20:30:41 UTC 2020
+# (c) Kazansky137 - Fri Apr  3 21:26:57 UTC 2020
 
 import sys
 import os
 import signal
 import atexit
 
-from common import log, catxt
+from common import log, adsb_ca
 from time import time
 
 import pyModeS as pms
@@ -68,7 +68,7 @@ class MyClient(TcpClient):
                 tc = pms.typecode(msg)
                 if tc == 4:          # Type code
                     cs = pms.adsb.callsign(msg)
-                    ca = catxt(msg)
+                    ca = self.discover.ca_txt(adsb_ca(msg))
                     print("{:15.9f} {:s} {:s} {:s} {:s}".format
                           (ts, msg, icao, ca, cs), flush=True)
             elif dfmt in [5, 21]:

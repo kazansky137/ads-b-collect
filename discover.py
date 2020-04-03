@@ -1,15 +1,25 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Apr  2 20:30:41 UTC 2020
+# (c) Kazansky137 - Fri Apr  3 21:26:57 UTC 2020
 
 import sys
 import os
 from time import time
-from common import log, catxt
+from common import log, adsb_ca
 import pyModeS as pms
 
 
-tc_txt = ["Aircraft identification",                   # 01
+ca_msg = ["None",   # 0 - No ADSB-Emitter
+          "Light",  # 1 - Light < 15500 lbs
+          "Small",  # 2 - Small   15500 to  75000 lbs
+          "Large",  # 3 - 75000 to 300000 lbs
+          "HVort",  # 4 - High Vortex Large (aircraft such as B-757)
+          "Heavy",  # 5 - Heavy > 300000 lbs
+          "HPerf",  # 6 - High Performance > 5 g acceleration and > 400 kts
+          "Rotor"   # 7 - Rotorcraft
+          ]
+
+tc_msg = ["Aircraft identification",                   # 01
           "Aircraft identification",                   # 02
           "Aircraft identification",                   # 03
           "Aircraft identification",                   # 04
@@ -54,8 +64,9 @@ class Discover:
         self.msgs_last_len28 = 0
         self.msgs_last_short = 0
 
-        self.downlink_format = [0] * 32     # 5 bits  1 ..  5
-        self.ads_b_type_code = [0] * 32     # 5 bits 33 .. 37
+        self.df = [0] * 32          # Downlink Format : 5 bits  1 ..  5
+        self.ca = [0] * 8           # capability      : 3 bits  6 ..  8
+        self.tc = [0] * 32          # Type Code       : 5 bits 33 .. 37
 
         self.parity_check_ok = 0
         self.parity_check_ko = 0
@@ -66,6 +77,9 @@ class Discover:
         # Time counters
         self.t_curr = time()
         self.t_last = time()
+
+    def ca_txt(self, index):
+        return ca_msg[index]
 
     def message(self, msg):
         ret_dict = {}
@@ -96,16 +110,18 @@ class Discover:
             self.check_legacy_ko = self.check_legacy_ko + 1
 
         dfmt = pms.df(msg)
-        self.downlink_format[dfmt] = self.downlink_format[dfmt] + 1
+        self.df[dfmt] = self.df[dfmt] + 1
 
         ret_dict['ic'] = pms.icao(msg)
 
         if dfmt in [17, 18]:    # Downlink format 17 or 18
             tc = pms.typecode(msg)
-            self.ads_b_type_code[tc] = self.ads_b_type_code[tc] + 1
+            self.tc[tc] = self.tc[tc] + 1
             if tc == 4:
                 ret_dict['cs'] = pms.adsb.callsign(msg)
-                ret_dict['ca'] = catxt(msg)
+                ca = adsb_ca(msg)
+                ret_dict['ca'] = ca
+                self.ca[ca] = self.ca[ca] + 1
         elif dfmt in [5, 21]:
                 ret_dict['sq'] = pms.idcode(msg)
 
@@ -148,19 +164,28 @@ class Discover:
         log("Running   : Raw Read  {:>12,d} check legacy ko"
             .format(self.check_legacy_ko))
 
-        for i in range(len(self.downlink_format)):
-            v = self.downlink_format[i]
+        for i in range(len(self.df)):
+            v = self.df[i]
             if v > 0:
                 log("Running   : Raw Read  {:>12,d} dfmt[{:2d}]"
                     .format(v, i))
 
         s = 0
-        for i in range(len(self.ads_b_type_code)):
-            v = self.ads_b_type_code[i]
+        for i in range(len(self.ca)):
+            v = self.ca[i]
+            if v > 0:
+                s = s + v
+                log("Running   : Raw Read  {:>12,d} ca[{:2d}] {:s}"
+                    .format(v, i, ca_msg[i]))
+        log("Running   : Raw Read  {:>12,d} ca cnt".format(s))
+
+        s = 0
+        for i in range(len(self.tc)):
+            v = self.tc[i]
             if v > 0:
                 s = s + v
                 log("Running   : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
-                    .format(v, i, tc_txt[i-1]))
+                    .format(v, i, tc_msg[i-1]))
         log("Running   : Raw Read  {:>12,d} tc17 cnt".format(s))
 
 

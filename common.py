@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Apr  2 20:30:41 UTC 2020
+# (c) Kazansky137 - Fri Apr  3 21:26:57 UTC 2020
 
 import io
 import os
@@ -127,25 +127,9 @@ def xt_reset(_file=sys.stdout):
     return
 
 
-def ca(_msg):
-    """
-    0 : No ADS-B Emitter Category Information
-    1 : Light < 15500 lbs.
-    2 : Small   15500 to  75000 lbs.
-    3 : Large   75000 to 300000 lbs.
-    4 : High Vortex Large (aircraft such as B-757)
-    5 : Heavy > 300000 lbs.
-    6 : High Performance > 5 g acceleration and > 400 kts
-    7 : Rotorcraft
-    """
+def adsb_ca(_msg):
     dfbin = pms.hex2bin(_msg[:2])
     return pms.bin2int(dfbin[5:8])
-
-
-def catxt(_msg):
-    camsg = ['None ', 'Light', 'Small', 'Large',
-             'HVort', 'Heavy', 'HPerf', 'Rotor']
-    return camsg[ca(_msg)]
 
 
 if __name__ == "__main__":
