@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Apr  3 21:26:57 UTC 2020
+# (c) Kazansky137 - Sat Apr  4 17:12:00 UTC 2020
 
 import sys
 import os
@@ -10,7 +10,6 @@ import atexit
 from common import log, adsb_ca
 from time import time
 
-import pyModeS as pms
 from pyModeS.extra.tcpclient import TcpClient
 from discover import Discover
 
@@ -35,8 +34,9 @@ class MyClient(TcpClient):
 
     def handle_messages(self, _messages):
         for msg, ts in _messages:
-            # log(self.discover.message(msg))
-            if self.discover.message(msg)['ret'] < 0:
+            adsb = self.discover.message(msg)
+            # log(adsb)
+            if adsb['ret'] < 0:
                 continue
 
             # Exit on SIGINT
@@ -56,23 +56,20 @@ class MyClient(TcpClient):
                 # Strip 12 first characters.
                 msg = msg[12:]
 
-            dfmt = pms.df(msg)
-            icao = pms.icao(msg)
+            dfmt = adsb['dfmt']
+            icao = adsb['ic']
 
             # Aircraft identification
             if dfmt == 17 or dfmt == 18:    # Downlink format 17 or 18
 
-                if pms.crc(msg) != 0:
-                    continue
-
-                tc = pms.typecode(msg)
+                tc = adsb['tc']
                 if tc == 4:          # Type code
-                    cs = pms.adsb.callsign(msg)
+                    cs = adsb['cs']
                     ca = self.discover.ca_txt(adsb_ca(msg))
                     print("{:15.9f} {:s} {:s} {:s} {:s}".format
                           (ts, msg, icao, ca, cs), flush=True)
             elif dfmt in [5, 21]:
-                    sq = pms.idcode(msg)
+                    sq = adsb['sq']
                     print("{:15.9f} {:s} {:s} {:s}".format
                           (ts, msg, icao, sq), flush=True)
 

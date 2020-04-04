@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Fri Apr  3 21:26:57 UTC 2020
+# (c) Kazansky137 - Sat Apr  4 17:12:00 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -25,4 +25,5 @@
 2020 Mar 24 00:42 : devpos - 01f99c5 : Added stats for crc, dfmt, tc28...
 2020 Mar 27 20:00 : devpos - 399d46c : Moved "bad" message in discover.py
 2020 Apr 03 22:15 : devpos - 858d651 : Moved catxt to common message return dict
-2020 Apr 04 23:30 : devpos -         : Corrected ca() handling + added stats.
+2020 Apr 03 23:30 : devpos - 5311d32 : Corrected ca() handling + added stats.
+2020 Apr 04 19:12 : devpos -         : Get all ADS-B data from discover

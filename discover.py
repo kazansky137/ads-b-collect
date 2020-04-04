@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Apr  3 21:26:57 UTC 2020
+# (c) Kazansky137 - Sat Apr  4 17:12:00 UTC 2020
 
 import sys
 import os
@@ -110,12 +110,14 @@ class Discover:
             self.check_legacy_ko = self.check_legacy_ko + 1
 
         dfmt = pms.df(msg)
+        ret_dict['dfmt'] = dfmt
         self.df[dfmt] = self.df[dfmt] + 1
 
         ret_dict['ic'] = pms.icao(msg)
 
         if dfmt in [17, 18]:    # Downlink format 17 or 18
             tc = pms.typecode(msg)
+            ret_dict['tc'] = tc
             self.tc[tc] = self.tc[tc] + 1
             if tc == 4:
                 ret_dict['cs'] = pms.adsb.callsign(msg)
