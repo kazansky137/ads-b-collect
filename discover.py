@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr  4 17:12:00 UTC 2020
+# (c) Kazansky137 - Wed Apr  8 22:40:00 UTC 2020
 
 import sys
 import os
@@ -119,13 +119,17 @@ class Discover:
             tc = pms.typecode(msg)
             ret_dict['tc'] = tc
             self.tc[tc] = self.tc[tc] + 1
-            if tc == 4:
+            if tc == 4:         # Aircraft identification
                 ret_dict['cs'] = pms.adsb.callsign(msg)
                 ca = adsb_ca(msg)
                 ret_dict['ca'] = ca
                 self.ca[ca] = self.ca[ca] + 1
         elif dfmt in [5, 21]:
                 ret_dict['sq'] = pms.idcode(msg)
+
+        if dfmt in [0, 4, 16, 20]:
+            alt = pms.altcode(msg)
+            ret_dict['alt'] = alt
 
         ret_dict['ret'] = 0
         return ret_dict

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sun Mar 22 18:27:31 UTC 2020
+# (c) Kazansky137 - Wed Apr  8 22:40:00 UTC 2020
 
 import alert
 from common import log
@@ -22,12 +22,18 @@ class Flight():
                      'cs': _cs,         # Call sign
                      'nm': 1}           # Number of messages
 
+        self.pos = {'alt': 0,           # Altitude
+                    'alt_min': 0,
+                    'alt_max': 0}
+
     def print(self, _file=sys.stdout):
-        print("{:s} {:s} {:s} {:s} {:>8s} {:5d} {:7.1f}".format
+        print("{:s} {:s} {:s} {:s} {:>8s} {:5d} {:7.1f} {:5d} {:5d} {:5d}"
+              .format
               (strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
                strftime("%d %H:%M:%S", gmtime(self.data['ls'])),
                self.data['ic'], str(self.data['sq']), str(self.data['cs']),
-               self.data['nm'], self.data['ls'] - self.data['fs']
+               self.data['nm'], self.data['ls'] - self.data['fs'],
+               self.pos['alt'], self.pos['alt_min'], self.pos['alt_max']
                ), file=_file)
 
 
@@ -54,10 +60,12 @@ class FlightList():
             cnt = cnt + flx.data['nm']
         return cnt
 
-    def addupd_flight(self, _ts, _ic, _sq=None, _cs=None):
+    def addupd_flight(self, _ts, _ic, _sq=None, _cs=None, _alt=None):
         if self.signal_hup == 1:
             self.signal_hup = 0
             self.alerts.reload()
+            self.print(_file=sys.stderr)
+            sys.stderr.flush()
 
         for flx in self.list:
             if flx.data['ic'] == _ic:
@@ -95,6 +103,14 @@ class FlightList():
 
                 flx.data['ls'] = float(_ts)
                 flx.data['nm'] = flx.data['nm'] + 1
+
+                if _alt is not None:
+                    _alt = int(_alt)
+                    flx.pos['alt'] = _alt
+                    if flx.pos['alt_min'] > _alt or flx.pos['alt_min'] == 0:
+                        flx.pos['alt_min'] = _alt
+                    if flx.pos['alt_max'] < _alt or flx.pos['alt_max'] == 0:
+                        flx.pos['alt_max'] = _alt
 
                 return
 
@@ -148,10 +164,12 @@ if __name__ == "__main__":
             last_ts = time()
 
         words = line.split()
-        if len(words) == 4:
-            fl.addupd_flight(words[0], words[2], _sq=words[3])
-        elif len(words) == 5:
-            fl.addupd_flight(words[0], words[2], _cs=words[4])
+        if words[0] == "SQ":
+            fl.addupd_flight(words[1], words[3], _sq=words[4])
+        elif words[0] == "CS":
+            fl.addupd_flight(words[1], words[3], _cs=words[5])
+        elif words[0] == "FL":
+            fl.addupd_flight(words[1], words[3], _alt=words[4])
         # log("\n")
 
     nmsgs = fl.print()
