@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu Apr  9 21:03:00 UTC 2020
+# (c) Kazansky137 - Sat Apr 11 21:14:29 UTC 2020
 
 import alert
 from common import log
@@ -28,7 +28,8 @@ class Flight():
                     'alt_max': int(_alt)}  # "        maximum
 
     def print(self, _file=sys.stdout):
-        if _file == sys.stderr and self.data['nm'] < 16:
+        if _file == sys.stderr and (self.data['nm'] < 16 or
+           (time() - self.data['ls']) > 60):
             return
 
         print("{:s} {:s} {:s} {:s} {:>8s} {:5d} {:7.1f} {:5d} {:5d} {:5d} {:5d}"
@@ -108,16 +109,21 @@ class FlightList():
 
                 _alt = int(_alt)
                 if _alt != 0:
-                    flx.pos['alt_ls'] = _alt
+                    # Temptative filter to discard bad data
+                    #  altitude >   300 feets
+                    #  delta    < 30000 feets
+                    if flx.pos['alt_ls'] == 0 or \
+                            (_alt > 300 and abs(flx.pos['alt_ls'] - _alt) < 30000):
+                        flx.pos['alt_ls'] = _alt
 
-                    if flx.pos['alt_fs'] == 0:
-                        flx.pos['alt_fs'] = _alt
+                        if flx.pos['alt_fs'] == 0:
+                            flx.pos['alt_fs'] = _alt
 
-                    if flx.pos['alt_min'] == 0 or flx.pos['alt_min'] > _alt:
-                        flx.pos['alt_min'] = _alt
+                        if flx.pos['alt_min'] == 0 or flx.pos['alt_min'] > _alt:
+                            flx.pos['alt_min'] = _alt
 
-                    if flx.pos['alt_max'] == 0 or flx.pos['alt_max'] < _alt:
-                        flx.pos['alt_max'] = _alt
+                        if flx.pos['alt_max'] == 0 or flx.pos['alt_max'] < _alt:
+                            flx.pos['alt_max'] = _alt
 
                 flx.data['ls'] = float(_ts)
                 flx.data['nm'] = flx.data['nm'] + 1
