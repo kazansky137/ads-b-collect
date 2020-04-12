@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 11 21:14:29 UTC 2020
+# (c) Kazansky137 - Sun Apr 12 16:51:33 UTC 2020
 
 import alert
 from common import log
@@ -29,7 +29,7 @@ class Flight():
 
     def print(self, _file=sys.stdout):
         if _file == sys.stderr and (self.data['nm'] < 16 or
-           (time() - self.data['ls']) > 60):
+           (time() - self.data['ls']) > 1800):
             return
 
         print("{:s} {:s} {:s} {:s} {:>8s} {:5d} {:7.1f} {:5d} {:5d} {:5d} {:5d}"
@@ -111,9 +111,11 @@ class FlightList():
                 if _alt != 0:
                     # Temptative filter to discard bad data
                     #  altitude >   300 feets
-                    #  delta    < 30000 feets
+                    #  altitude < 60000 feets (Concorde)
+                    #  delta    < 10000 feets
                     if flx.pos['alt_ls'] == 0 or \
-                            (_alt > 300 and abs(flx.pos['alt_ls'] - _alt) < 30000):
+                            (_alt > 300 and _alt < 60000 and
+                             abs(flx.pos['alt_ls'] - _alt) < 10000):
                         flx.pos['alt_ls'] = _alt
 
                         if flx.pos['alt_fs'] == 0:
