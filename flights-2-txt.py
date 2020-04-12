@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sun Apr 12 16:51:33 UTC 2020
+# (c) Kazansky137 - Sun Apr 12 17:38:38 UTC 2020
 
 import alert
 from common import log
@@ -32,14 +32,14 @@ class Flight():
            (time() - self.data['ls']) > 1800):
             return
 
-        print("{:s} {:s} {:s} {:s} {:>8s} {:5d} {:7.1f} {:5d} {:5d} {:5d} {:5d}"
-              .format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
-                      strftime("%d %H:%M:%S", gmtime(self.data['ls'])),
-                      self.data['ic'], str(self.data['sq']),
-                      str(self.data['cs']), self.data['nm'],
-                      self.data['ls'] - self.data['fs'],
-                      self.pos['alt_fs'], self.pos['alt_ls'],
-                      self.pos['alt_min'], self.pos['alt_max']), file=_file)
+        fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}"
+        print(fmt.format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
+              strftime("%d %H:%M:%S", gmtime(self.data['ls'])),
+              self.data['ic'], str(self.data['sq']),
+              str(self.data['cs']), self.data['nm'],
+              self.data['ls'] - self.data['fs'],
+              self.pos['alt_fs'], self.pos['alt_ls'],
+              self.pos['alt_min'], self.pos['alt_max']), file=_file)
 
 
 class FlightList():
@@ -75,13 +75,15 @@ class FlightList():
         for flx in self.list:
             if flx.data['ic'] == _ic:
                 # log("Existing flight for icao",
-                #     _ic, flx.data['sq'], flx.data['cs'], flx.pos['alt_ls'], flx.data['nm'])
+                #     _ic, flx.data['sq'], flx.data['cs'],
+                #     flx.pos['alt_ls'], flx.data['nm'])
 
                 if _sq is not None:
                     if flx.data['sq'] is not None:
                         if flx.data['sq'] != _sq:
                             new_fl = Flight(_ic, _ts, _sq, _cs, _alt)
-                            # log("New flight from squawk", _sq, new_fl.data, new_fl.pos)
+                            # log("New flight from squawk", _sq,
+                            #     new_fl.data, new_fl.pos)
                             self.add(new_fl)
                             self.alerts.check(_ic, _ts, _sq, _cs)
                             return
@@ -96,7 +98,8 @@ class FlightList():
                     if flx.data['cs'] is not None:
                         if flx.data['cs'] != _cs:
                             new_fl = Flight(_ic, _ts, _sq, _cs, _alt)
-                            # log("New flight from callsn", _cs, new_fl.data, new_fl.pos)
+                            # log("New flight from callsn", _cs, new_fl.data,
+                            #     new_fl.pos)
                             self.add(new_fl)
                             self.alerts.check(_ic, _ts, _sq, _cs)
                             return
@@ -121,10 +124,12 @@ class FlightList():
                         if flx.pos['alt_fs'] == 0:
                             flx.pos['alt_fs'] = _alt
 
-                        if flx.pos['alt_min'] == 0 or flx.pos['alt_min'] > _alt:
+                        if flx.pos['alt_min'] == 0 or \
+                                flx.pos['alt_min'] > _alt:
                             flx.pos['alt_min'] = _alt
 
-                        if flx.pos['alt_max'] == 0 or flx.pos['alt_max'] < _alt:
+                        if flx.pos['alt_max'] == 0 or \
+                                flx.pos['alt_max'] < _alt:
                             flx.pos['alt_max'] = _alt
 
                 flx.data['ls'] = float(_ts)
