@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sun Apr 12 17:38:38 UTC 2020
+# (c) Kazansky137 - Tue Apr 14 17:31:01 UTC 2020
 
 import alert
 from common import log
@@ -85,14 +85,16 @@ class FlightList():
                             # log("New flight from squawk", _sq,
                             #     new_fl.data, new_fl.pos)
                             self.add(new_fl)
-                            self.alerts.check(_ic, _ts, _sq, _cs)
+                            self.alerts.check(_ic, _ts, _sq, _cs, _alt)
                             return
                         else:
-                            self.alerts.check(_ic, _ts, _sq, _cs)
+                            self.alerts.check(_ic, _ts, _sq, _cs,
+                                              flx.pos['alt_ls'])
                     else:
                         # log("Updated call squawk", _sq)
                         flx.data['sq'] = _sq
-                        self.alerts.check(_ic, _ts, _sq, _cs)
+                        self.alerts.check(_ic, _ts, _sq, _cs,
+                                          flx.pos['alt_ls'])
 
                 if _cs is not None:
                     if flx.data['cs'] is not None:
@@ -101,14 +103,16 @@ class FlightList():
                             # log("New flight from callsn", _cs, new_fl.data,
                             #     new_fl.pos)
                             self.add(new_fl)
-                            self.alerts.check(_ic, _ts, _sq, _cs)
+                            self.alerts.check(_ic, _ts, _sq, _cs, _alt)
                             return
                         else:
-                            self.alerts.check(_ic, _ts, _sq, _cs)
+                            self.alerts.check(_ic, _ts, _sq, _cs,
+                                              flx.pos['alt_ls'])
                     else:
                         # log("Updated call sign", _cs)
                         flx.data['cs'] = _cs
-                        self.alerts.check(_ic, _ts, _sq, _cs)
+                        self.alerts.check(_ic, _ts, _sq, _cs,
+                                          flx.pos['alt_ls'])
 
                 _alt = int(_alt)
                 if _alt != 0:
@@ -141,7 +145,7 @@ class FlightList():
             new_fl = Flight(_ic, _ts, _sq, _cs, _alt)
             self.add(new_fl)
             # log("New flight", new_fl.data, new_fl.pos)
-            self.alerts.check(_ic, _ts, _sq, _cs)
+            self.alerts.check(_ic, _ts, _sq, _cs, _alt)
 
         except Exception as e:
             global cnt
