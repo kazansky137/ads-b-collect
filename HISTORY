@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sat Apr  4 23:14:00 CEST 2020
+# (c) Kazansky137 - Wed Apr 15 17:32:29 CEST 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -28,4 +28,5 @@
 2020 Apr 03 23:30 : devpos - 5311d32 : Corrected ca() handling + added stats.
 2020 Apr 04 19:12 : devpos - c1042ff : Get all ADS-B data from discover
 2020 Apr 04 22:40 : master - 14b5a25 : Updated config/icao-tail.txt.
-2020 Apr 04 23:14 : master -         : Added TREE history file.
+2020 Apr 04 23:14 : master - 6cdb593 : Added TREE history file.
+2020 Apr 15 17:32 : master -         : Updated HISTORY and TREE files
