@@ -29,4 +29,10 @@
 2020 Apr 04 19:12 : devpos - c1042ff : Get all ADS-B data from discover
 2020 Apr 04 22:40 : master - 14b5a25 : Updated config/icao-tail.txt.
 2020 Apr 04 23:14 : master - 6cdb593 : Added TREE history file.
-2020 Apr 15 17:32 : master -         : Updated HISTORY and TREE files
+2020 Apr 08 22:40 : devpos - 3822811 : Added management of altitude.
+2020 Apr 09 23:03 : devpos - e5144e8 : Bugs corrected + add ls, fs, min, max alt
+2020 Apr 11 23:15 : devpos - 8f13953 : Adapted flights output. Added alt filter
+2020 Apr 12 16:55 : devpos - da20343 : Adapted altitude filter
+2020 Apr 12 17:38 : devpos - b7a86e0 : Made pep8 v2.3.1 compliant.
+2020 Apr 14 17:35 : devpos - 3f5da30 : Alerts now handle altitude
+2020 Apr 15 17:32 : master - 56617ae : Updated HISTORY and TREE files

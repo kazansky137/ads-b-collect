@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr  4 17:12:00 UTC 2020
+# (c) Kazansky137 - Wed Apr  8 22:40:00 UTC 2020
 
 import sys
 import os
@@ -66,12 +66,17 @@ class MyClient(TcpClient):
                 if tc == 4:          # Type code
                     cs = adsb['cs']
                     ca = self.discover.ca_txt(adsb_ca(msg))
-                    print("{:15.9f} {:s} {:s} {:s} {:s}".format
-                          (ts, msg, icao, ca, cs), flush=True)
+                    print("{:3s} {:15.9f} {:s} {:s} {:s} {:s}".format
+                          ("CS", ts, msg, icao, ca, cs), flush=True)
             elif dfmt in [5, 21]:
                     sq = adsb['sq']
-                    print("{:15.9f} {:s} {:s} {:s}".format
-                          (ts, msg, icao, sq), flush=True)
+                    print("{:3s} {:15.9f} {:s} {:s} {:s}".format
+                          ("SQ", ts, msg, icao, sq), flush=True)
+
+            if dfmt in [0, 4, 16, 20]:
+                alt = adsb['alt']
+                print("{:3s} {:15.9f} {:s} {:s} {:d}".format
+                      ("FL", ts, msg, icao, alt), flush=True)
 
 
 def handler_atexit():

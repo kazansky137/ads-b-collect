@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
+# (c) Kazansky137 - Tue Apr 14 17:31:01 UTC 2020
 
 from common import log, load
 import sys
@@ -32,14 +32,21 @@ class Alert():
     def message(self):
         return str(self.alert)
 
-    def log(self, _ts, _ic, _file=sys.stderr):
+    def log(self, _ts, _ic, _alt=0, _file=sys.stderr):
         tail = flightlist.FlightList.codes.tail(_ic)
-        self.mail.send("Alert: {:s} : {:s}".format(_ic, tail), self.message())
-        log("Alert: {:s} : {:s} : {:s} ".format(_ic, tail, self.message()),
+        fmt = "Alert: {:s} : {:s} : {:5d}"
+        self.mail.send(fmt.format(_ic, tail, int(_alt)), self.message())
+        fmt = "Alert: {:s} : {:s} : {:5d} : {:s}"
+        log(fmt.format(_ic, tail, int(_alt), self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
         if self.alert[0] == "urg":
-            self.ring.send("{:s} {:s}\n{:s}"
-                           .format(_ic, tail, self.alert[3]))
+            if int(_alt) > 4000:  # Typical transition altitude
+                fl = int(int(_alt)/100)
+                self.ring.send("{:s} {:s} FL{:d}\n{:s}"
+                               .format(_ic, tail, fl, self.alert[3]))
+            else:
+                self.ring.send("{:s} {:s} {:5d}\n{:s}"
+                               .format(_ic, tail, int(_alt), self.alert[3]))
 
 
 class AlertList():
@@ -68,8 +75,10 @@ class AlertList():
         for alert in self.list:
             alert.print(_file=_file)
 
-    def check(self, _ic, _ts, _sq, _cs):
-        # log("Check Flight ", _ic, _ts, _sq, _cs)
+    def check(self, _ic, _ts, _sq, _cs, _alt=0):
+        if int(_alt) == 0:   # Alert delayed waiting for altitude
+            return None
+        # log("Check Flight ", _ic, _ts, _sq, _cs, _alt)
         for alert in self.list:
             # log("Check alert",alert.message())
             if float(_ts) - float(alert.fs) < alert.alert[4]:
@@ -78,8 +87,8 @@ class AlertList():
                (alert.alert[1] == 'sq' and alert.alert[2] == _sq) or
                (alert.alert[1] == 'cs' and alert.alert[2] == _cs)):
                 alert.fs = _ts
-                # log("Matching   ",alert.message())
-                alert.log(_ts, _ic)
+                # log("Matching   ", alert.message())
+                alert.log(_ts, _ic, _alt)
                 return alert
         return None
 
