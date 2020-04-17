@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr  8 22:40:00 UTC 2020
+# (c) Kazansky137 - Fri Apr 17 17:06:41 UTC 2020
 
 import sys
 import os
 from time import time
 from common import log, adsb_ca
-import pyModeS as pms
+from pyModeS import common, adsb
 
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
@@ -99,36 +99,36 @@ class Discover:
 
         self.msgs_curr_len28 = self.msgs_curr_len28 + 1
 
-        if pms.crc(msg) == 0:
+        if common.crc(msg) == 0:
             self.parity_check_ok = self.parity_check_ok + 1
         else:
             self.parity_check_ko = self.parity_check_ko + 1
 
-        if pms.crc_legacy(msg) == 0:
+        if common.crc_legacy(msg) == 0:
             self.check_legacy_ok = self.check_legacy_ok + 1
         else:
             self.check_legacy_ko = self.check_legacy_ko + 1
 
-        dfmt = pms.df(msg)
+        dfmt = common.df(msg)
         ret_dict['dfmt'] = dfmt
         self.df[dfmt] = self.df[dfmt] + 1
 
-        ret_dict['ic'] = pms.icao(msg)
+        ret_dict['ic'] = common.icao(msg)
 
         if dfmt in [17, 18]:    # Downlink format 17 or 18
-            tc = pms.typecode(msg)
+            tc = common.typecode(msg)
             ret_dict['tc'] = tc
             self.tc[tc] = self.tc[tc] + 1
             if tc == 4:         # Aircraft identification
-                ret_dict['cs'] = pms.adsb.callsign(msg)
+                ret_dict['cs'] = adsb.callsign(msg)
                 ca = adsb_ca(msg)
                 ret_dict['ca'] = ca
                 self.ca[ca] = self.ca[ca] + 1
         elif dfmt in [5, 21]:
-                ret_dict['sq'] = pms.idcode(msg)
+                ret_dict['sq'] = common.idcode(msg)
 
         if dfmt in [0, 4, 16, 20]:
-            alt = pms.altcode(msg)
+            alt = common.altcode(msg)
             ret_dict['alt'] = alt
 
         ret_dict['ret'] = 0
