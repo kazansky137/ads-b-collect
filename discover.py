@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
+# (c) Kazansky137 - Sat Apr 18 20:07:38 UTC 2020
 
 import sys
 import os
@@ -17,6 +17,40 @@ ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Heavy",  # 5 - Heavy > 300000 lbs
           "HPerf",  # 6 - High Performance > 5 g acceleration and > 400 kts
           "Rotor"   # 7 - Rotorcraft
+          ]
+
+df_msg = ["ADS-B 56 bits Short air to air ACAS BDS 0.E",    # 00
+          "",                                               # 01
+          "",                                               # 02
+          "",                                               # 03
+          "ADS-B 56 bits Surveillance altitude",            # 04
+          "ADS-B 56 bits Surveillance identity",            # 05
+          "",                                               # 06
+          "",                                               # 07
+          "",                                               # 08
+          "",                                               # 09
+          "",                                               # 10
+          "ADS-B 56 bits Mode-S only all call reply",       # 11
+          "",                                               # 12
+          "",                                               # 13
+          "",                                               # 14
+          "",                                               # 15
+          "",                                               # 16
+          "ADS-B ES (112 bits) BDS 0.[5..9]",               # 17
+          "",                                               # 18
+          "",                                               # 19
+          "Mode-S EHS altitude reply BDS [4,5,6].0",        # 20
+          "Mode-S EHS identity reply BDS [4,5,6].0",        # 21
+          "",                                               # 22
+          "",                                               # 23
+          "",                                               # 24
+          "",                                               # 25
+          "",                                               # 26
+          "",                                               # 27
+          "",                                               # 28
+          "",                                               # 29
+          "",                                               # 30
+          ""                                                # 31
           ]
 
 tc_msg = ["Aircraft identification",                   # 01
@@ -94,10 +128,8 @@ class Discover:
 
         if len(msg) < 28:        # Message length 112 bits
             self.msgs_curr_short = self.msgs_curr_short + 1
-            ret_dict['ret'] = -1
-            return ret_dict
-
-        self.msgs_curr_len28 = self.msgs_curr_len28 + 1
+        else:
+            self.msgs_curr_len28 = self.msgs_curr_len28 + 1
 
         if common.crc(msg) == 0:
             self.parity_check_ok = self.parity_check_ok + 1
@@ -174,11 +206,23 @@ class Discover:
         log("Running   : Raw Read  {:>12,d} check legacy ko"
             .format(self.check_legacy_ko))
 
+        s = 0
         for i in range(len(self.df)):
             v = self.df[i]
             if v > 0:
-                log("Running   : Raw Read  {:>12,d} dfmt[{:2d}]"
-                    .format(v, i))
+                s = s + v
+                log("Running   : Raw Read  {:>12,d} dfmt[{:2d}] {:s}"
+                    .format(v, i, df_msg[i]))
+        log("Running   : Raw Read  {:>12,d} df cnt".format(s))
+
+        s = 0
+        for i in range(len(self.tc)):
+            v = self.tc[i]
+            if v > 0:
+                s = s + v
+                log("Running   : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
+                    .format(v, i, tc_msg[i-1]))
+        log("Running   : Raw Read  {:>12,d} tc17/18 cnt".format(s))
 
         s = 0
         for i in range(len(self.ca)):
@@ -188,15 +232,6 @@ class Discover:
                 log("Running   : Raw Read  {:>12,d} ca[{:2d}] {:s}"
                     .format(v, i, ca_msg[i]))
         log("Running   : Raw Read  {:>12,d} ca cnt".format(s))
-
-        s = 0
-        for i in range(len(self.tc)):
-            v = self.tc[i]
-            if v > 0:
-                s = s + v
-                log("Running   : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
-                    .format(v, i, tc_msg[i-1]))
-        log("Running   : Raw Read  {:>12,d} tc17 cnt".format(s))
 
 
 if __name__ == "__main__":
