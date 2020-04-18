@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Apr 17 17:06:41 UTC 2020
+# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
 
 import sys
 import os
@@ -124,6 +124,10 @@ class Discover:
                 ca = adsb_ca(msg)
                 ret_dict['ca'] = ca
                 self.ca[ca] = self.ca[ca] + 1
+            elif 9 <= tc <= 18:
+                ret_dict['altb'] = adsb.altitude(msg)
+            elif 20 <= tc <= 22:
+                ret_dict['altg'] = adsb.altitude(msg)
         elif dfmt in [5, 21]:
                 ret_dict['sq'] = common.idcode(msg)
 

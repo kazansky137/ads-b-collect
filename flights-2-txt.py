@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 14 17:31:01 UTC 2020
+# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
 
 import alert
 from common import log
@@ -116,6 +116,7 @@ class FlightList():
 
                 _alt = int(_alt)
                 if _alt != 0:
+                    # Should base test on a sliding mean window !!
                     # Temptative filter to discard bad data
                     #  altitude >   300 feets
                     #  altitude < 60000 feets (Concorde)
@@ -195,7 +196,7 @@ if __name__ == "__main__":
             fl.addupd_flight(words[1], words[3], _sq=words[4])
         elif words[0] == "CS":
             fl.addupd_flight(words[1], words[3], _cs=words[5])
-        elif words[0] == "FL":
+        elif words[0] in ["AL", "AB", "AG"]:
             fl.addupd_flight(words[1], words[3], _alt=words[4])
         # log("\n")
 

@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Fri Apr 17 17:06:41 UTC 2020
+# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -33,4 +33,5 @@
 2020 Apr 12 16:55 : devpos - da20343 : Adapted altitude filter
 2020 Apr 12 17:38 : devpos - b7a86e0 : Made pep8 v2.3.1 compliant.
 2020 Apr 14 17:35 : devpos - 3f5da30 : Alerts now handle altitude
-2020 Apr 17 19;06 : devpos -         : Simplified import of pyModeS
+2020 Apr 17 19;06 : devpos - 4ba890c : Simplified import of pyModeS
+2020 Apr 18 16:37 : devpos -         : Now handle baroc and gnss alt + bug corr

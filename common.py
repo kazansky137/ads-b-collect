@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri Apr 17 17:06:41 UTC 2020
+# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
 
 import io
 import os
@@ -129,7 +129,7 @@ def xt_reset(_file=sys.stdout):
 
 def adsb_ca(_msg):
     dfbin = common.hex2bin(_msg[:2])
-    return pms.bin2int(dfbin[5:8])
+    return common.bin2int(dfbin[5:8])
 
 
 if __name__ == "__main__":
