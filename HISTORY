@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
+# (c) Kazansky137 - Tue Apr 21 21:27:52 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -36,4 +36,5 @@
 2020 Apr 17 19;06 : devpos - 4ba890c : Simplified import of pyModeS
 2020 Apr 18 16:37 : devpos - ee7ea20 : Now handle baroc and gnss alt + bug corr
 2020 Apr 18 22:07 : devpos - 44a31c7 : Now handle 56 bits messages
-2020 Apr 21 19:00 : devpos -         : Manage lat and long, added scripts
+2020 Apr 21 19:00 : devpos - d319ad5 : Manage lat and long, added scripts
+2020 Apr 21 21:27 : devpos -         : Print flightlist is last seen order

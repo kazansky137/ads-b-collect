@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
+# (c) Kazansky137 - Tue Apr 21 21:27:52 UTC 2020
 
 import alert
 from common import log, distance
@@ -35,8 +35,10 @@ class Flight():
            (time() - self.data['ls']) > 1800):
             return
 
-        dist = distance(self.pos['lat_ls'], self.pos['long_ls'],
-                        50.55413, 4.68801)
+        dist = 0.0
+        if self.pos['lat_ls'] != 0.0 and self.pos['long_ls'] != 0.0:
+            dist = distance(self.pos['lat_ls'], self.pos['long_ls'],
+                            50.55413, 4.68801)
         fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}" + " {:5.1f}"
         print(fmt.format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
               strftime("%d %H:%M:%S", gmtime(self.data['ls'])),
@@ -45,6 +47,12 @@ class Flight():
               self.data['ls'] - self.data['fs'],
               self.pos['alt_fs'], self.pos['alt_ls'],
               self.pos['alt_min'], self.pos['alt_max'], dist), file=_file)
+
+    def __eq__(self, other):
+        return self.data['ls'] == other.data['ls']
+
+    def __lt__(self, other):
+        return self.data['ls'] < other.data['ls']
 
 
 class FlightList():
@@ -65,7 +73,8 @@ class FlightList():
 
     def print(self, _file=sys.stdout):
         cnt = 0
-        for flx in reversed(self.list):
+        # for flx in reversed(self.list):
+        for flx in sorted(self.list):
             flx.print(_file)
             cnt = cnt + flx.data['nm']
         return cnt
