@@ -1,9 +1,9 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
+# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
 
 import alert
-from common import log
+from common import log, distance
 import sys
 import os
 import signal
@@ -14,7 +14,8 @@ icaocodes = importlib.import_module("icao-codes")
 
 class Flight():
 
-    def __init__(self, _ic, _ts, _sq=None, _cs=None, _alt='0'):
+    def __init__(self, _ic, _ts, _sq=None, _cs=None,
+                 _alt='0', _lat='0', _long='0'):
         self.data = {'ic': _ic,         # Icao hex code
                      'fs': float(_ts),  # First seen
                      'ls': float(_ts),  # Last seen
@@ -22,24 +23,28 @@ class Flight():
                      'cs': _cs,         # Call sign
                      'nm': 1}           # Number of messages
 
-        self.pos = {'alt_fs': int(_alt),   # Altitude first seen
-                    'alt_ls': int(_alt),   # "        last seen
-                    'alt_min': int(_alt),  # "        minimum
-                    'alt_max': int(_alt)}  # "        maximum
+        self.pos = {'alt_fs': int(_alt),      # Altitude first seen
+                    'alt_ls': int(_alt),      # "        last seen
+                    'alt_min': int(_alt),     # "        minimum
+                    'alt_max': int(_alt),     # "        maximum
+                    'lat_ls': float(_lat),    # "        maximum
+                    'long_ls': float(_long)}  # "        maximum
 
     def print(self, _file=sys.stdout):
         if _file == sys.stderr and (self.data['nm'] < 16 or
            (time() - self.data['ls']) > 1800):
             return
 
-        fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}"
+        dist = distance(self.pos['lat_ls'], self.pos['long_ls'],
+                        50.55413, 4.68801)
+        fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}" + " {:5.1f}"
         print(fmt.format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
               strftime("%d %H:%M:%S", gmtime(self.data['ls'])),
               self.data['ic'], str(self.data['sq']),
               str(self.data['cs']), self.data['nm'],
               self.data['ls'] - self.data['fs'],
               self.pos['alt_fs'], self.pos['alt_ls'],
-              self.pos['alt_min'], self.pos['alt_max']), file=_file)
+              self.pos['alt_min'], self.pos['alt_max'], dist), file=_file)
 
 
 class FlightList():
@@ -65,7 +70,8 @@ class FlightList():
             cnt = cnt + flx.data['nm']
         return cnt
 
-    def addupd_flight(self, _ts, _ic, _sq=None, _cs=None, _alt='0'):
+    def addupd_flight(self, _ts, _ic, _sq=None, _cs=None,
+                      _alt='0', _lat='0', _long='0'):
         if self.signal_hup == 1:
             self.signal_hup = 0
             self.alerts.reload()
@@ -137,6 +143,12 @@ class FlightList():
                                 flx.pos['alt_max'] < _alt:
                             flx.pos['alt_max'] = _alt
 
+                if _lat != '0':
+                    flx.pos['lat_ls'] = float(_lat)
+
+                if _long != '0':
+                    flx.pos['long_ls'] = float(_long)
+
                 flx.data['ls'] = float(_ts)
                 flx.data['nm'] = flx.data['nm'] + 1
 
@@ -196,8 +208,11 @@ if __name__ == "__main__":
             fl.addupd_flight(words[1], words[3], _sq=words[4])
         elif words[0] == "CS":
             fl.addupd_flight(words[1], words[3], _cs=words[5])
-        elif words[0] in ["AL", "AB", "AG"]:
+        elif words[0] in ["AL"]:
             fl.addupd_flight(words[1], words[3], _alt=words[4])
+        elif words[0] in ["LB", "LG"]:
+            fl.addupd_flight(words[1], words[3], _alt=words[4],
+                             _lat=words[5], _long=words[6])
         # log("\n")
 
     nmsgs = fl.print()

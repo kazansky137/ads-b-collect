@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
+# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
 
 import sys
 import os
@@ -70,12 +70,18 @@ class MyClient(TcpClient):
                           ("CS", ts, msg, icao, ca, cs), flush=True)
                 elif 9 <= tc <= 18:
                     alt = adsb['altb']
-                    print("{:3s} {:15.9f} {:s} {:s} {:d}".format
-                          ("AB", ts, msg, icao, alt), flush=True)
+                    lat = adsb['lat']
+                    long = adsb['long']
+                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:9.5f} {:9.5f}"
+                    print(fmt.format
+                          ("LB", ts, msg, icao, alt, lat, long), flush=True)
                 elif 20 <= tc <= 22:
                     alt = adsb['altg']
-                    print("{:3s} {:15.9f} {:s} {:s} {:d}".format
-                          ("AG", ts, msg, icao, alt), flush=True)
+                    lat = adsb['lat']
+                    long = adsb['long']
+                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:9.5f} {:9.5f}"
+                    print(fmt.format
+                          ("LG", ts, msg, icao, alt, lat, long), flush=True)
 
             elif dfmt in [5, 21]:
                     sq = adsb['sq']

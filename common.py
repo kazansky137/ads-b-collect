@@ -1,11 +1,12 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 18 16:37:51 UTC 2020
+# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
 
 import io
 import os
 import sys
 import re
+import math
 from time import gmtime, strftime
 from pyModeS import common
 
@@ -130,6 +131,21 @@ def xt_reset(_file=sys.stdout):
 def adsb_ca(_msg):
     dfbin = common.hex2bin(_msg[:2])
     return common.bin2int(dfbin[5:8])
+
+
+def distance(lat1, long1, lat2, long2):
+    R = 6372800  # Earth radius in meters
+
+    phi1, phi2 = math.radians(lat1), math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(long2 - long1)
+
+    a = math.sin(dphi/2)**2 + \
+        math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+
+    d = 2*R*math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    return d/1852.0
 
 
 if __name__ == "__main__":
