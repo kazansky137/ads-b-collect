@@ -1,9 +1,9 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 18:04:12 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
 import alert
-from common import log, distance, bearing
+from common import log, distance, bearing, load_config
 import sys
 import os
 import signal
@@ -17,6 +17,10 @@ class Flight():
 
     def __init__(self, _ic, _ts, _sq=None, _cs=None,
                  _alt='0', _lat='0', _long='0'):
+
+        self.params = {}
+        load_config(self.params, "config/config.txt")
+
         self.data = {'ic': _ic,         # Icao hex code
                      'fs': float(_ts),  # First seen
                      'ls': float(_ts),  # Last seen
@@ -36,13 +40,15 @@ class Flight():
            (time() - self.data['ls']) > 1800):
             return
 
+        lat_ref = float(self.params["lat"])
+        long_ref = float(self.params["long"])
         dist = 0.0
         bear = 0.0
         if self.pos['lat_ls'] != 0.0 and self.pos['long_ls'] != 0.0:
             dist = distance(self.pos['lat_ls'], self.pos['long_ls'],
-                            50.55413, 4.68801)
+                            lat_ref, long_ref)
             bear = bearing(self.pos['lat_ls'], self.pos['long_ls'],
-                           50.55413, 4.68801)
+                           lat_ref, long_ref)
         fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}" + \
               " {:9.5f} {:9.5f} {:5.1f} {:5.1f}°"
         print(fmt.format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
@@ -111,7 +117,7 @@ class FlightList():
                             #     new_fl.data, new_fl.pos)
                             self.add(new_fl)
                             _alt, _lat, _long = \
-                            int(_alt), float(_lat), float(_long)
+                                int(_alt), float(_lat), float(_long)
                             self.alerts.check(_ic, _ts, _sq, _cs,
                                               _alt, _lat, _long)
                             return
@@ -136,7 +142,7 @@ class FlightList():
                             #     new_fl.pos)
                             self.add(new_fl)
                             _alt, _lat, _long = \
-                            int(_alt), float(_lat), float(_long)
+                                int(_alt), float(_lat), float(_long)
                             self.alerts.check(_ic, _ts, _sq, _cs,
                                               _alt, _lat, _long)
                             return

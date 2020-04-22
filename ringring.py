@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
 import sys
 import requests
@@ -11,13 +11,13 @@ class RingRing():
 
     def __init__(self):
         self.params = {}
-        load_config(self.params, "config/ringring.txt")
+        load_config(self.params, "config/config.txt")
         return
 
     def send(self, _msg):
         _msg = self.params["prefix"] + " \n" + _msg
         values = {"apiKey":     self.params["apiKey"],
-                  "to":         self.params["to"],
+                  "to":         self.params["phone"],
                   "message":    _msg
                   }
         r = requests.post("https://api.ringring.be/sms/v1/message",
@@ -26,7 +26,7 @@ class RingRing():
         return
 
     def phone(self):
-        return self.params["to"]
+        return self.params["phone"]
 
 
 if __name__ == "__main__":

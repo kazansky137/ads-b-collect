@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
 import sys
 import os
@@ -14,7 +14,7 @@ class SendMail():
 
     def __init__(self):
         self.params = {}
-        load_config(self.params, "config/sendmail.txt")
+        load_config(self.params, "config/config.txt")
         pass
 
     def send(self, _subj, _msg):

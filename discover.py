@@ -1,11 +1,11 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
 import sys
 import os
 from time import time
-from common import log, adsb_ca
+from common import log, adsb_ca, load_config
 from pyModeS import common, adsb
 
 
@@ -90,6 +90,9 @@ tc_msg = ["Aircraft identification",                   # 01
 class Discover:
 
     def __init__(self):
+        self.params = {}
+        load_config(self.params, "config/config.txt")
+
         self.msgs_curr_total = 0
         self.msgs_curr_len28 = 0
         self.msgs_curr_short = 0
@@ -151,6 +154,10 @@ class Discover:
             tc = common.typecode(msg)
             ret_dict['tc'] = tc
             self.tc[tc] = self.tc[tc] + 1
+
+            lat_ref = float(self.params["lat"])
+            long_ref = float(self.params["long"])
+
             if tc == 4:         # Aircraft identification
                 ret_dict['cs'] = adsb.callsign(msg)
                 ca = adsb_ca(msg)
@@ -158,12 +165,12 @@ class Discover:
                 self.ca[ca] = self.ca[ca] + 1
             elif 9 <= tc <= 18:
                 ret_dict['altb'] = adsb.altitude(msg)
-                (lat, long) = adsb.position_with_ref(msg, 50.55413, 4.68801)
+                (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)
                 ret_dict['lat'] = lat
                 ret_dict['long'] = long
             elif 20 <= tc <= 22:
                 ret_dict['altg'] = adsb.altitude(msg)
-                (lat, long) = adsb.position_with_ref(msg, 50.55413, 4.68801)
+                (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)
                 ret_dict['lat'] = lat
                 ret_dict['long'] = long
         elif dfmt in [5, 21]:

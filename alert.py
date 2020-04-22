@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 18:04:12 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
-from common import log, load, distance, bearing
+from common import log, load, distance, bearing, load_config
 import sys
 import sendmail
 import ringring
@@ -58,6 +58,9 @@ class AlertList():
         self.add(Alert('urg', 'sq', '7700', "General Emergency", 60))
 
     def __init__(self):
+        self.params = {}
+        load_config(self.params, "config/config.txt")
+
         self.list = []
         self.addpermanent()
         cnt = load(self, "config/alerts.txt", Alert)
@@ -94,8 +97,10 @@ class AlertList():
                (alert.alert[1] == 'cs' and alert.alert[2] == _cs)):
                 alert.fs = _ts
                 # log("Matching   ", alert.message())
-                dist = distance(_lat, _long, 50.55413, 4.68801)
-                bear = bearing(_lat, _long, 50.55413, 4.68801)
+                lat_ref = float(self.params["lat"])
+                long_ref = float(self.params["long"])
+                dist = distance(_lat, _long, lat_ref, long_ref)
+                bear = bearing(_lat, _long, lat_ref, long_ref)
                 alert.log(_ts, _ic, _alt, dist, bear)
                 return alert
         return None
