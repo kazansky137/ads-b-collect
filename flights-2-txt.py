@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 21 21:27:52 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 11:41:40 UTC 2020
 
 import alert
 from common import log, distance
@@ -48,11 +48,18 @@ class Flight():
               self.pos['alt_fs'], self.pos['alt_ls'],
               self.pos['alt_min'], self.pos['alt_max'], dist), file=_file)
 
-    def __eq__(self, other):
-        return self.data['ls'] == other.data['ls']
-
     def __lt__(self, other):
-        return self.data['ls'] < other.data['ls']
+        # Order by last seen
+        # If equal order by first seen
+        s_ls = gmtime(self.data['ls'])
+        o_ls = gmtime(other.data['ls'])
+        if s_ls == o_ls:
+            s_fs = gmtime(self.data['fs'])
+            o_fs = gmtime(other.data['fs'])
+            val = s_fs < o_fs
+        else:
+            val = s_ls < o_ls
+        return val
 
 
 class FlightList():
@@ -73,7 +80,6 @@ class FlightList():
 
     def print(self, _file=sys.stdout):
         cnt = 0
-        # for flx in reversed(self.list):
         for flx in sorted(self.list):
             flx.print(_file)
             cnt = cnt + flx.data['nm']
@@ -213,15 +219,22 @@ if __name__ == "__main__":
             last_ts = time()
 
         words = line.split()
-        if words[0] == "SQ":
-            fl.addupd_flight(words[1], words[3], _sq=words[4])
-        elif words[0] == "CS":
-            fl.addupd_flight(words[1], words[3], _cs=words[5])
-        elif words[0] in ["AL"]:
-            fl.addupd_flight(words[1], words[3], _alt=words[4])
-        elif words[0] in ["LB", "LG"]:
-            fl.addupd_flight(words[1], words[3], _alt=words[4],
-                             _lat=words[5], _long=words[6])
+        try:
+            if words[0] == "SQ":
+                fl.addupd_flight(words[1], words[3], _sq=words[4])
+            elif words[0] == "CS":
+                fl.addupd_flight(words[1], words[3], _cs=words[5])
+            elif words[0] in ["AL"]:
+                fl.addupd_flight(words[1], words[3], _alt=words[4])
+            elif words[0] in ["LB", "LG"]:
+                fl.addupd_flight(words[1], words[3], _alt=words[4],
+                                 _lat=words[5], _long=words[6])
+
+        except Exception as e:
+            log("Exception:", e)
+            log(words)
+            log(line)
+
         # log("\n")
 
     nmsgs = fl.print()
