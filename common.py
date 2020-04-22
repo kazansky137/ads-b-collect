@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 18:04:12 UTC 2020
 
 import io
 import os
@@ -141,11 +141,25 @@ def distance(lat1, long1, lat2, long2):
     dlambda = math.radians(long2 - long1)
 
     a = math.sin(dphi/2)**2 + \
-        math.cos(phi1)*math.cos(phi2)*math.sin(dlambda/2)**2
+        math.cos(phi1) * math.cos(phi2) * math.sin(dlambda/2)**2
 
-    d = 2*R*math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    c = 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-    return d/1852.0
+    return c/1852.0
+
+
+def bearing(lat1, lon1, lat2, lon2):
+    lat1, lat2 = math.radians(lat1), math.radians(lat2)
+
+    dlon = math.radians(lon2 - lon1)
+
+    y = math.sin(dlon) * math.cos(lat2)
+    x = math.cos(lat1) * math.sin(lat2) - \
+        (math.sin(lat1) * math.cos(lat2) * math.cos(dlon))
+
+    brng = math.degrees(math.atan2(y, x))
+
+    return (brng + 180) % 360
 
 
 if __name__ == "__main__":

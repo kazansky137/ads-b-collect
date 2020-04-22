@@ -1,14 +1,15 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 11:41:40 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 18:04:12 UTC 2020
 
 import alert
-from common import log, distance
+from common import log, distance, bearing
 import sys
 import os
 import signal
 from time import gmtime, strftime, time
 import importlib
+import traceback
 icaocodes = importlib.import_module("icao-codes")
 
 
@@ -36,26 +37,29 @@ class Flight():
             return
 
         dist = 0.0
+        bear = 0.0
         if self.pos['lat_ls'] != 0.0 and self.pos['long_ls'] != 0.0:
             dist = distance(self.pos['lat_ls'], self.pos['long_ls'],
                             50.55413, 4.68801)
-        fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}" + " {:5.1f}"
+            bear = bearing(self.pos['lat_ls'], self.pos['long_ls'],
+                           50.55413, 4.68801)
+        fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}" + \
+              " {:9.5f} {:9.5f} {:5.1f} {:5.1f}°"
         print(fmt.format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
               strftime("%d %H:%M:%S", gmtime(self.data['ls'])),
               self.data['ic'], str(self.data['sq']),
               str(self.data['cs']), self.data['nm'],
               self.data['ls'] - self.data['fs'],
               self.pos['alt_fs'], self.pos['alt_ls'],
-              self.pos['alt_min'], self.pos['alt_max'], dist), file=_file)
+              self.pos['alt_min'], self.pos['alt_max'],
+              self.pos['lat_ls'], self.pos['long_ls'], dist, bear), file=_file)
 
     def __lt__(self, other):
         # Order by last seen
         # If equal order by first seen
-        s_ls = gmtime(self.data['ls'])
-        o_ls = gmtime(other.data['ls'])
+        s_ls, o_ls = gmtime(self.data['ls']), gmtime(other.data['ls'])
         if s_ls == o_ls:
-            s_fs = gmtime(self.data['fs'])
-            o_fs = gmtime(other.data['fs'])
+            s_fs, o_fs = gmtime(self.data['fs']), gmtime(other.data['fs'])
             val = s_fs < o_fs
         else:
             val = s_ls < o_ls
@@ -106,16 +110,23 @@ class FlightList():
                             # log("New flight from squawk", _sq,
                             #     new_fl.data, new_fl.pos)
                             self.add(new_fl)
-                            self.alerts.check(_ic, _ts, _sq, _cs, _alt)
+                            _alt, _lat, _long = \
+                            int(_alt), float(_lat), float(_long)
+                            self.alerts.check(_ic, _ts, _sq, _cs,
+                                              _alt, _lat, _long)
                             return
                         else:
                             self.alerts.check(_ic, _ts, _sq, _cs,
-                                              flx.pos['alt_ls'])
+                                              flx.pos['alt_ls'],
+                                              flx.pos['lat_ls'],
+                                              flx.pos['long_ls'])
                     else:
                         # log("Updated call squawk", _sq)
                         flx.data['sq'] = _sq
                         self.alerts.check(_ic, _ts, _sq, _cs,
-                                          flx.pos['alt_ls'])
+                                          flx.pos['alt_ls'],
+                                          flx.pos['lat_ls'],
+                                          flx.pos['long_ls'])
 
                 if _cs is not None:
                     if flx.data['cs'] is not None:
@@ -124,16 +135,23 @@ class FlightList():
                             # log("New flight from callsn", _cs, new_fl.data,
                             #     new_fl.pos)
                             self.add(new_fl)
-                            self.alerts.check(_ic, _ts, _sq, _cs, _alt)
+                            _alt, _lat, _long = \
+                            int(_alt), float(_lat), float(_long)
+                            self.alerts.check(_ic, _ts, _sq, _cs,
+                                              _alt, _lat, _long)
                             return
                         else:
                             self.alerts.check(_ic, _ts, _sq, _cs,
-                                              flx.pos['alt_ls'])
+                                              flx.pos['alt_ls'],
+                                              flx.pos['lat_ls'],
+                                              flx.pos['long_ls'])
                     else:
                         # log("Updated call sign", _cs)
                         flx.data['cs'] = _cs
                         self.alerts.check(_ic, _ts, _sq, _cs,
-                                          flx.pos['alt_ls'])
+                                          flx.pos['alt_ls'],
+                                          flx.pos['lat_ls'],
+                                          flx.pos['long_ls'])
 
                 _alt = int(_alt)
                 if _alt != 0:
@@ -173,12 +191,14 @@ class FlightList():
             new_fl = Flight(_ic, _ts, _sq, _cs, _alt)
             self.add(new_fl)
             # log("New flight", new_fl.data, new_fl.pos)
-            self.alerts.check(_ic, _ts, _sq, _cs, _alt)
+            _alt, _lat, _long = int(_alt), float(_lat), float(_long)
+            self.alerts.check(_ic, _ts, _sq, _cs, _alt, _lat, _long)
 
         except Exception as e:
             global cnt
             log("Exception:", e)
             log("         : Check input line {:10d}".format(cnt))
+            log(traceback.format_exc())
 
 
 if __name__ == "__main__":
@@ -240,7 +260,7 @@ if __name__ == "__main__":
     nmsgs = fl.print()
 
     if nmsgs != cnt:
-        log("Terminated: Fail {:>12,d} cnt != {:>12,d} nmsgs"
+        log("Terminated: Warning {:>12,d} cnt != {:>12,d} nmsgs"
             .format(cnt, nmsgs))
 
     log("Terminated: Processed {:>12,d} messages ({:5d} /s)"

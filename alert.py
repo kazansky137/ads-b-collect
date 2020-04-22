@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 14 17:31:01 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 18:04:12 UTC 2020
 
-from common import log, load
+from common import log, load, distance, bearing
 import sys
 import sendmail
 import ringring
@@ -32,21 +32,24 @@ class Alert():
     def message(self):
         return str(self.alert)
 
-    def log(self, _ts, _ic, _alt=0, _file=sys.stderr):
+    def log(self, _ts, _ic, _alt, _dist, _bear, _file=sys.stderr):
         tail = flightlist.FlightList.codes.tail(_ic)
+        _alt, _dist, _bear = int(_alt), float(_dist), float(_bear)
         fmt = "Alert: {:s} : {:s} : {:5d}"
-        self.mail.send(fmt.format(_ic, tail, int(_alt)), self.message())
-        fmt = "Alert: {:s} : {:s} : {:5d} : {:s}"
-        log(fmt.format(_ic, tail, int(_alt), self.message()),
+        self.mail.send(fmt.format(_ic, tail, _alt), self.message())
+        fmt = "Alert: {:s} : {:s} : {:5d} {:5.1f} {:5.1f}° {:s}"
+        log(fmt.format(_ic, tail, _alt, _dist, _bear, self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
         if self.alert[0] == "urg":
-            if int(_alt) > 4000:  # Typical transition altitude
-                fl = int(int(_alt)/100)
-                self.ring.send("{:s} {:s} FL{:d}\n{:s}"
-                               .format(_ic, tail, fl, self.alert[3]))
+            if _alt > 4000:  # Typical transition altitude
+                fl = int(_alt/100)
+                self.ring.send("{:s} {:s} FL{:d} {:5.1f} {:5.1f}°\n{:s}"
+                               .format(_ic, tail, fl, _dist, _bear,
+                                       self.alert[3]))
             else:
-                self.ring.send("{:s} {:s} {:5d}\n{:s}"
-                               .format(_ic, tail, int(_alt), self.alert[3]))
+                self.ring.send("{:s} {:s} {:5d} {:5.1f} {:5.1f}°\n{:s}"
+                               .format(_ic, tail, _alt, _dist, _bear,
+                                       self.alert[3]))
 
 
 class AlertList():
@@ -75,8 +78,11 @@ class AlertList():
         for alert in self.list:
             alert.print(_file=_file)
 
-    def check(self, _ic, _ts, _sq, _cs, _alt=0):
-        if int(_alt) == 0:   # Alert delayed waiting for altitude
+    def check(self, _ic, _ts, _sq, _cs, _alt, _lat, _long):
+        # Alert delayed waiting for altitude and position
+        if _alt == 0:
+            return None
+        if _lat == 0.0 and _long == 0.0:
             return None
         # log("Check Flight ", _ic, _ts, _sq, _cs, _alt)
         for alert in self.list:
@@ -88,7 +94,9 @@ class AlertList():
                (alert.alert[1] == 'cs' and alert.alert[2] == _cs)):
                 alert.fs = _ts
                 # log("Matching   ", alert.message())
-                alert.log(_ts, _ic, _alt)
+                dist = distance(_lat, _long, 50.55413, 4.68801)
+                bear = bearing(_lat, _long, 50.55413, 4.68801)
+                alert.log(_ts, _ic, _alt, dist, bear)
                 return alert
         return None
 

@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Wed Apr 22 11:41:40 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 18:04:12 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -38,4 +38,5 @@
 2020 Apr 18 22:07 : devpos - 44a31c7 : Now handle 56 bits messages
 2020 Apr 21 19:00 : devpos - d319ad5 : Manage lat and long, added scripts
 2020 Apr 21 21:27 : devpos - 1c65a9c : Print flightlist is last seen order
-2020 Apr 22 12:08 : devpos -         : Bugs corr, ordered flight list printout
+2020 Apr 22 12:08 : devpos - 07b0e68 : Bugs corr, ordered flight list printout
+2020 Apr 22 20;04 : devpos -         : Compute and print distance and bearing
