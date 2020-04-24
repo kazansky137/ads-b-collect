@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+# (c) Kazansky137 - Fri Apr 24 17:18:34 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -40,4 +40,5 @@
 2020 Apr 21 21:27 : devpos - 1c65a9c : Print flightlist is last seen order
 2020 Apr 22 12:08 : devpos - 07b0e68 : Bugs corr, ordered flight list printout
 2020 Apr 22 20;04 : devpos - e5b84e5 : Compute and print distance and bearing
-2020 Apr 23 00;09 : devpos -         : Merged config files to config.txt
+2020 Apr 23 00;09 : devpos - a8958bb : Merged config files to config.txt
+2020 Apr 24 19:18 : devpos -         : Alert based on Flights, improved outputs

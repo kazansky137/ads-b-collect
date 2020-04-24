@@ -23,7 +23,7 @@ class SendMail():
         msg['From'] = self.params["from"]
         msg['To'] = self.params["to"]
         msg['Reply-To'] = self.params["reply"]
-        msg['Subject'] = _subj
+        msg['Subject'] = self.params["prefix"] + ": " + _subj
         msg.set_content(_msg)
         smtp.send_message(msg)
         smtp.quit()

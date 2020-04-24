@@ -15,7 +15,7 @@ class RingRing():
         return
 
     def send(self, _msg):
-        _msg = self.params["prefix"] + " \n" + _msg
+        _msg = self.params["prefix"] + " " + _msg
         values = {"apiKey":     self.params["apiKey"],
                   "to":         self.params["phone"],
                   "message":    _msg

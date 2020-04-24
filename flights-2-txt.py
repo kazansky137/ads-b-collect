@@ -112,55 +112,35 @@ class FlightList():
                 if _sq is not None:
                     if flx.data['sq'] is not None:
                         if flx.data['sq'] != _sq:
-                            new_fl = Flight(_ic, _ts, _sq, _cs, _alt)
-                            # log("New flight from squawk", _sq,
-                            #     new_fl.data, new_fl.pos)
+                            new_fl = Flight(_ic, _ts, _sq, _cs,
+                                            _alt, _lat, _long)
+                            # log("New flight from squawk",
+                            #     _sq, new_fl.data, new_fl.pos)
+                            self.alerts.check(new_fl)
                             self.add(new_fl)
-                            _alt, _lat, _long = \
-                                int(_alt), float(_lat), float(_long)
-                            self.alerts.check(_ic, _ts, _sq, _cs,
-                                              _alt, _lat, _long)
                             return
-                        else:
-                            self.alerts.check(_ic, _ts, _sq, _cs,
-                                              flx.pos['alt_ls'],
-                                              flx.pos['lat_ls'],
-                                              flx.pos['long_ls'])
                     else:
-                        # log("Updated call squawk", _sq)
                         flx.data['sq'] = _sq
-                        self.alerts.check(_ic, _ts, _sq, _cs,
-                                          flx.pos['alt_ls'],
-                                          flx.pos['lat_ls'],
-                                          flx.pos['long_ls'])
+                        # log("Add SQ ", flx.data, flx.pos)
 
                 if _cs is not None:
                     if flx.data['cs'] is not None:
                         if flx.data['cs'] != _cs:
-                            new_fl = Flight(_ic, _ts, _sq, _cs, _alt)
-                            # log("New flight from callsn", _cs, new_fl.data,
-                            #     new_fl.pos)
+                            new_fl = Flight(_ic, _ts, _sq, _cs,
+                                            _alt, _lat, _long)
+                            # log("New flight from callsn", _cs,
+                            #     new_fl.data, new_fl.pos)
+                            self.alerts.check(new_fl)
                             self.add(new_fl)
-                            _alt, _lat, _long = \
-                                int(_alt), float(_lat), float(_long)
-                            self.alerts.check(_ic, _ts, _sq, _cs,
-                                              _alt, _lat, _long)
                             return
-                        else:
-                            self.alerts.check(_ic, _ts, _sq, _cs,
-                                              flx.pos['alt_ls'],
-                                              flx.pos['lat_ls'],
-                                              flx.pos['long_ls'])
                     else:
-                        # log("Updated call sign", _cs)
                         flx.data['cs'] = _cs
-                        self.alerts.check(_ic, _ts, _sq, _cs,
-                                          flx.pos['alt_ls'],
-                                          flx.pos['lat_ls'],
-                                          flx.pos['long_ls'])
+                        # log("Add CS ", flx.data, flx.pos)
 
+                # Altitude change do not create flights
+                #   Update if alt_ls change detected
                 _alt = int(_alt)
-                if _alt != 0:
+                if _alt != 0 and flx.pos['alt_ls'] != _alt:
                     # Should base test on a sliding mean window !!
                     # Temptative filter to discard bad data
                     #  altitude >   300 feets
@@ -181,24 +161,27 @@ class FlightList():
                         if flx.pos['alt_max'] == 0 or \
                                 flx.pos['alt_max'] < _alt:
                             flx.pos['alt_max'] = _alt
+                        # log("Update ALT", flx.data, flx.pos)
 
-                if _lat != '0':
+                # Position change do not create flights
+                #   Update permanently
+                if _lat != '0' and _long != '0':
                     flx.pos['lat_ls'] = float(_lat)
-
-                if _long != '0':
                     flx.pos['long_ls'] = float(_long)
+                    # log("Update POS", flx.data, flx.pos)
 
                 flx.data['ls'] = float(_ts)
                 flx.data['nm'] = flx.data['nm'] + 1
 
+                self.alerts.check(flx)
+
                 return
 
         try:
-            new_fl = Flight(_ic, _ts, _sq, _cs, _alt)
+            new_fl = Flight(_ic, _ts, _sq, _cs, _alt, _lat, _long)
             self.add(new_fl)
             # log("New flight", new_fl.data, new_fl.pos)
-            _alt, _lat, _long = int(_alt), float(_lat), float(_long)
-            self.alerts.check(_ic, _ts, _sq, _cs, _alt, _lat, _long)
+            self.alerts.check(new_fl)
 
         except Exception as e:
             global cnt
