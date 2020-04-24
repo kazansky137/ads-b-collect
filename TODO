@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Thu Dec 19 15:18:08 CET 2019
+# (c) Kazansky137 - Fri Apr 24 19:28:54 CEST 2020
 
 General
 -------
@@ -9,6 +9,11 @@ Alerting : Should add media like Telegram or mobile app.
 
 Config : Should validate config files (e.g. ';' instead of ':', case of letters)
 Config : Should manage to reload line icao-tail.txt
+
+flights-2-txt.py
+----------------
+Flight:			Should handle minimum and maximum distance
+addupd_flight:	Should adapt filter for altitude to sliding window
 
 common.py
 ---------

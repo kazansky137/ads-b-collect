@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Wed Apr 15 17:32:29 CEST 2020
+# (c) Kazansky137 - Fri Apr 24 19:28:54 CEST 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -36,3 +36,5 @@
 2020 Apr 12 17:38 : devpos - b7a86e0 : Made pep8 v2.3.1 compliant.
 2020 Apr 14 17:35 : devpos - 3f5da30 : Alerts now handle altitude
 2020 Apr 15 17:32 : master - 56617ae : Updated HISTORY and TREE files
+2020 Apr 16 20:04 : master - c278ff5 : Merge branch 'devpos' @3f5da30
+2020 Apr 24 19:28 : master -         : Updated HISTORY and TREE files
