@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+# (c) Kazansky137 - Sat Apr 25 15:38:50 UTC 2020
 
 import alert
 from common import log, distance, bearing, load_config
@@ -102,6 +102,9 @@ class FlightList():
             self.alerts.reload()
             self.print(_file=sys.stderr)
             sys.stderr.flush()
+
+        if _ic == '000000':
+            return
 
         for flx in self.list:
             if flx.data['ic'] == _ic:
