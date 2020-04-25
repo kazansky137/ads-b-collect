@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Mar 17 18:03:25 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
 import sys
 import os
@@ -14,7 +14,7 @@ class SendMail():
 
     def __init__(self):
         self.params = {}
-        load_config(self.params, "config/sendmail.txt")
+        load_config(self.params, "config/config.txt")
         pass
 
     def send(self, _subj, _msg):
@@ -23,7 +23,7 @@ class SendMail():
         msg['From'] = self.params["from"]
         msg['To'] = self.params["to"]
         msg['Reply-To'] = self.params["reply"]
-        msg['Subject'] = _subj
+        msg['Subject'] = self.params["prefix"] + ": " + _subj
         msg.set_content(_msg)
         smtp.send_message(msg)
         smtp.quit()

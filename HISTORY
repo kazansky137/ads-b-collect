@@ -1,7 +1,7 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Fri Apr 24 19:28:54 CEST 2020
-
+# (c) Kazansky137 - Sat Apr 25 18:05:35 CEST 2020
+#
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
 2019 Dec 11 11:42 : devout - 26b700e : Bugs correction
@@ -37,4 +37,15 @@
 2020 Apr 14 17:35 : devpos - 3f5da30 : Alerts now handle altitude
 2020 Apr 15 17:32 : master - 56617ae : Updated HISTORY and TREE files
 2020 Apr 16 20:04 : master - c278ff5 : Merge branch 'devpos' @3f5da30
-2020 Apr 24 19:28 : master -         : Updated HISTORY and TREE files
+2020 Apr 17 19;06 : devpos - 4ba890c : Simplified import of pyModeS
+2020 Apr 18 16:37 : devpos - ee7ea20 : Now handle baroc and gnss alt + bug corr
+2020 Apr 18 22:07 : devpos - 44a31c7 : Now handle 56 bits messages
+2020 Apr 21 19:00 : devpos - d319ad5 : Manage lat and long, added scripts
+2020 Apr 21 21:27 : devpos - 1c65a9c : Print flightlist is last seen order
+2020 Apr 22 12:08 : devpos - 07b0e68 : Bugs corr, ordered flight list printout
+2020 Apr 22 20;04 : devpos - e5b84e5 : Compute and print distance and bearing
+2020 Apr 23 00;09 : devpos - a8958bb : Merged config files to config.txt
+2020 Apr 24 19:18 : devpos - e89f4b0 : Alert based on Flights, improved outputs
+2020 Apr 24 19:28 : master - 25a14dc : Updated HISTORY and TREE files
+2020 Apr 25 17:38 : devpos - 486ec64 : Bug corr in sh., skip null icao msgs
+2020 Apr 25 18:05 : master -         : Merge branch 'devpos' @486ec64

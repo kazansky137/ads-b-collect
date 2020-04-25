@@ -1,12 +1,12 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr  8 22:40:00 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
 import sys
 import os
 from time import time
-from common import log, adsb_ca
-import pyModeS as pms
+from common import log, adsb_ca, load_config
+from pyModeS import common, adsb
 
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
@@ -17,6 +17,40 @@ ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Heavy",  # 5 - Heavy > 300000 lbs
           "HPerf",  # 6 - High Performance > 5 g acceleration and > 400 kts
           "Rotor"   # 7 - Rotorcraft
+          ]
+
+df_msg = ["ADS-B 56 bits Short air to air ACAS BDS 0.E",    # 00
+          "",                                               # 01
+          "",                                               # 02
+          "",                                               # 03
+          "ADS-B 56 bits Surveillance altitude",            # 04
+          "ADS-B 56 bits Surveillance identity",            # 05
+          "",                                               # 06
+          "",                                               # 07
+          "",                                               # 08
+          "",                                               # 09
+          "",                                               # 10
+          "ADS-B 56 bits Mode-S only all call reply",       # 11
+          "",                                               # 12
+          "",                                               # 13
+          "",                                               # 14
+          "",                                               # 15
+          "",                                               # 16
+          "ADS-B ES (112 bits) BDS 0.[5..9]",               # 17
+          "",                                               # 18
+          "",                                               # 19
+          "Mode-S EHS altitude reply BDS [4,5,6].0",        # 20
+          "Mode-S EHS identity reply BDS [4,5,6].0",        # 21
+          "",                                               # 22
+          "",                                               # 23
+          "",                                               # 24
+          "",                                               # 25
+          "",                                               # 26
+          "",                                               # 27
+          "",                                               # 28
+          "",                                               # 29
+          "",                                               # 30
+          ""                                                # 31
           ]
 
 tc_msg = ["Aircraft identification",                   # 01
@@ -56,6 +90,9 @@ tc_msg = ["Aircraft identification",                   # 01
 class Discover:
 
     def __init__(self):
+        self.params = {}
+        load_config(self.params, "config/config.txt")
+
         self.msgs_curr_total = 0
         self.msgs_curr_len28 = 0
         self.msgs_curr_short = 0
@@ -94,41 +131,53 @@ class Discover:
 
         if len(msg) < 28:        # Message length 112 bits
             self.msgs_curr_short = self.msgs_curr_short + 1
-            ret_dict['ret'] = -1
-            return ret_dict
+        else:
+            self.msgs_curr_len28 = self.msgs_curr_len28 + 1
 
-        self.msgs_curr_len28 = self.msgs_curr_len28 + 1
-
-        if pms.crc(msg) == 0:
+        if common.crc(msg) == 0:
             self.parity_check_ok = self.parity_check_ok + 1
         else:
             self.parity_check_ko = self.parity_check_ko + 1
 
-        if pms.crc_legacy(msg) == 0:
+        if common.crc_legacy(msg) == 0:
             self.check_legacy_ok = self.check_legacy_ok + 1
         else:
             self.check_legacy_ko = self.check_legacy_ko + 1
 
-        dfmt = pms.df(msg)
+        dfmt = common.df(msg)
         ret_dict['dfmt'] = dfmt
         self.df[dfmt] = self.df[dfmt] + 1
 
-        ret_dict['ic'] = pms.icao(msg)
+        ret_dict['ic'] = common.icao(msg)
 
         if dfmt in [17, 18]:    # Downlink format 17 or 18
-            tc = pms.typecode(msg)
+            tc = common.typecode(msg)
             ret_dict['tc'] = tc
             self.tc[tc] = self.tc[tc] + 1
+
+            lat_ref = float(self.params["lat"])
+            long_ref = float(self.params["long"])
+
             if tc == 4:         # Aircraft identification
-                ret_dict['cs'] = pms.adsb.callsign(msg)
+                ret_dict['cs'] = adsb.callsign(msg)
                 ca = adsb_ca(msg)
                 ret_dict['ca'] = ca
                 self.ca[ca] = self.ca[ca] + 1
+            elif 9 <= tc <= 18:
+                ret_dict['altb'] = adsb.altitude(msg)
+                (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)
+                ret_dict['lat'] = lat
+                ret_dict['long'] = long
+            elif 20 <= tc <= 22:
+                ret_dict['altg'] = adsb.altitude(msg)
+                (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)
+                ret_dict['lat'] = lat
+                ret_dict['long'] = long
         elif dfmt in [5, 21]:
-                ret_dict['sq'] = pms.idcode(msg)
+                ret_dict['sq'] = common.idcode(msg)
 
         if dfmt in [0, 4, 16, 20]:
-            alt = pms.altcode(msg)
+            alt = common.altcode(msg)
             ret_dict['alt'] = alt
 
         ret_dict['ret'] = 0
@@ -170,11 +219,23 @@ class Discover:
         log("Running   : Raw Read  {:>12,d} check legacy ko"
             .format(self.check_legacy_ko))
 
+        s = 0
         for i in range(len(self.df)):
             v = self.df[i]
             if v > 0:
-                log("Running   : Raw Read  {:>12,d} dfmt[{:2d}]"
-                    .format(v, i))
+                s = s + v
+                log("Running   : Raw Read  {:>12,d} dfmt[{:2d}] {:s}"
+                    .format(v, i, df_msg[i]))
+        log("Running   : Raw Read  {:>12,d} df cnt".format(s))
+
+        s = 0
+        for i in range(len(self.tc)):
+            v = self.tc[i]
+            if v > 0:
+                s = s + v
+                log("Running   : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
+                    .format(v, i, tc_msg[i-1]))
+        log("Running   : Raw Read  {:>12,d} tc17/18 cnt".format(s))
 
         s = 0
         for i in range(len(self.ca)):
@@ -184,15 +245,6 @@ class Discover:
                 log("Running   : Raw Read  {:>12,d} ca[{:2d}] {:s}"
                     .format(v, i, ca_msg[i]))
         log("Running   : Raw Read  {:>12,d} ca cnt".format(s))
-
-        s = 0
-        for i in range(len(self.tc)):
-            v = self.tc[i]
-            if v > 0:
-                s = s + v
-                log("Running   : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
-                    .format(v, i, tc_msg[i-1]))
-        log("Running   : Raw Read  {:>12,d} tc17 cnt".format(s))
 
 
 if __name__ == "__main__":

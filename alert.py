@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 14 17:31:01 UTC 2020
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
 
-from common import log, load
+from common import log, load, distance, bearing, load_config
 import sys
 import sendmail
 import ringring
@@ -32,21 +32,25 @@ class Alert():
     def message(self):
         return str(self.alert)
 
-    def log(self, _ts, _ic, _alt=0, _file=sys.stderr):
+    def log(self, _ts, _ic, _alt, _dist, _bear, _file=sys.stderr):
         tail = flightlist.FlightList.codes.tail(_ic)
-        fmt = "Alert: {:s} : {:s} : {:5d}"
-        self.mail.send(fmt.format(_ic, tail, int(_alt)), self.message())
-        fmt = "Alert: {:s} : {:s} : {:5d} : {:s}"
-        log(fmt.format(_ic, tail, int(_alt), self.message()),
+        _alt, _dist, _bear = int(_alt), float(_dist), float(_bear)
+        fmt = "{:6s} : {:8s} : {:5d} {:5.1f} {:5.1f}°"
+        self.mail.send(fmt.format(_ic, tail, _alt, _dist, _bear),
+                       self.message())
+        fmt = "{:6s} : {:8s} : {:5d} {:5.1f} {:5.1f}° {:s}"
+        log(fmt.format(_ic, tail, _alt, _dist, _bear, self.message()),
             _ts=_ts, _file=_file, _col=alert_cat[self.alert[0]])
         if self.alert[0] == "urg":
-            if int(_alt) > 4000:  # Typical transition altitude
-                fl = int(int(_alt)/100)
-                self.ring.send("{:s} {:s} FL{:d}\n{:s}"
-                               .format(_ic, tail, fl, self.alert[3]))
+            if _alt > 4000:  # Typical transition altitude
+                fl = int(_alt/100)
+                self.ring.send("{:s} {:s}\nFL{:d} {:5.1f} {:5.1f}°\n{:s}"
+                               .format(_ic, tail, fl, _dist, _bear,
+                                       self.alert[3]))
             else:
-                self.ring.send("{:s} {:s} {:5d}\n{:s}"
-                               .format(_ic, tail, int(_alt), self.alert[3]))
+                self.ring.send("{:s} {:s}\n{:5d} {:5.1f} {:5.1f}°\n{:s}"
+                               .format(_ic, tail, _alt, _dist, _bear,
+                                       self.alert[3]))
 
 
 class AlertList():
@@ -55,6 +59,9 @@ class AlertList():
         self.add(Alert('urg', 'sq', '7700', "General Emergency", 60))
 
     def __init__(self):
+        self.params = {}
+        load_config(self.params, "config/config.txt")
+
         self.list = []
         self.addpermanent()
         cnt = load(self, "config/alerts.txt", Alert)
@@ -75,20 +82,35 @@ class AlertList():
         for alert in self.list:
             alert.print(_file=_file)
 
-    def check(self, _ic, _ts, _sq, _cs, _alt=0):
-        if int(_alt) == 0:   # Alert delayed waiting for altitude
-            return None
-        # log("Check Flight ", _ic, _ts, _sq, _cs, _alt)
+    def check(self, fl):
+        # log("Check Flight ", fl.data, fl.pos)
+        # Alert delayed waiting for position or least 16 messages
+        if fl.data['nm'] < 16:
+            if fl.pos['alt_ls'] == 0:
+                return None
+            if fl.pos['lat_ls'] == 0.0 and fl.pos['long_ls']:
+                return None
+
         for alert in self.list:
             # log("Check alert",alert.message())
-            if float(_ts) - float(alert.fs) < alert.alert[4]:
+            if fl.data['ls'] - alert.fs < alert.alert[4]:
                 continue
-            if((alert.alert[1] == 'ic' and alert.alert[2] == _ic) or
-               (alert.alert[1] == 'sq' and alert.alert[2] == _sq) or
-               (alert.alert[1] == 'cs' and alert.alert[2] == _cs)):
-                alert.fs = _ts
+            if((alert.alert[1] == 'ic' and alert.alert[2] == fl.data['ic']) or
+               (alert.alert[1] == 'sq' and alert.alert[2] == fl.data['sq']) or
+               (alert.alert[1] == 'cs' and alert.alert[2] == fl.data['cs'])):
+                alert.fs = fl.data['ls']
                 # log("Matching   ", alert.message())
-                alert.log(_ts, _ic, _alt)
+                lat_ref = float(self.params["lat"])
+                long_ref = float(self.params["long"])
+                if fl.pos['lat_ls'] != 0.0 and fl.pos['long_ls'] != 0.0:
+                    dist = distance(fl.pos['lat_ls'],
+                                    fl.pos['long_ls'], lat_ref, long_ref)
+                    bear = bearing(fl.pos['lat_ls'],
+                                   fl.pos['long_ls'], lat_ref, long_ref)
+                else:
+                    dist = bear = 0.0
+                alert.log(fl.data['ls'], fl.data['ic'],
+                          fl.pos['alt_ls'], dist, bear)
                 return alert
         return None
 

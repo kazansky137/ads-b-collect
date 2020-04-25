@@ -1,0 +1,16 @@
+# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+
+# reference position
+lat  : 50.55413
+long : 4.68801
+
+# rinring
+apiKey : 8325BF10-59D2-423B-B2EF-43AB2AA6229F
+phone  : 0475/56.58.76
+prefix : ALERT GBX-SE
+
+# sendmail
+server : smtp.skynet.be
+from   : alert@belradar24.be
+reply  : info@belradar24.be
+to     : alain.ninane@uclouvain.be

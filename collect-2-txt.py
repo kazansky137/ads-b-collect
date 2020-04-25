@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr  8 22:40:00 UTC 2020
+# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
 
 import sys
 import os
@@ -68,6 +68,21 @@ class MyClient(TcpClient):
                     ca = self.discover.ca_txt(adsb_ca(msg))
                     print("{:3s} {:15.9f} {:s} {:s} {:s} {:s}".format
                           ("CS", ts, msg, icao, ca, cs), flush=True)
+                elif 9 <= tc <= 18:
+                    alt = adsb['altb']
+                    lat = adsb['lat']
+                    long = adsb['long']
+                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:9.5f} {:9.5f}"
+                    print(fmt.format
+                          ("LB", ts, msg, icao, alt, lat, long), flush=True)
+                elif 20 <= tc <= 22:
+                    alt = adsb['altg']
+                    lat = adsb['lat']
+                    long = adsb['long']
+                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:9.5f} {:9.5f}"
+                    print(fmt.format
+                          ("LG", ts, msg, icao, alt, lat, long), flush=True)
+
             elif dfmt in [5, 21]:
                     sq = adsb['sq']
                     print("{:3s} {:15.9f} {:s} {:s} {:s}".format
@@ -76,7 +91,7 @@ class MyClient(TcpClient):
             if dfmt in [0, 4, 16, 20]:
                 alt = adsb['alt']
                 print("{:3s} {:15.9f} {:s} {:s} {:d}".format
-                      ("FL", ts, msg, icao, alt), flush=True)
+                      ("AL", ts, msg, icao, alt), flush=True)
 
 
 def handler_atexit():

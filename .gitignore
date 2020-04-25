@@ -5,7 +5,6 @@ messages-*.txt
 archives/
 aircrafts/
 config/alerts.txt
-config/ringring.txt
-config/sendmail.txt
 tests/
+config/config.txt
 __pycache__/
