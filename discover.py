@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+# (c) Kazansky137 - Sat Apr 25 21:38:06 UTC 2020
 
 import sys
 import os
@@ -168,6 +168,9 @@ class Discover:
                 (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)
                 ret_dict['lat'] = lat
                 ret_dict['long'] = long
+            elif tc == 19:
+                (ret_dict['speed'], ret_dict['head'], ret_dict['rocd'], var) \
+                 = adsb.velocity(msg)
             elif 20 <= tc <= 22:
                 ret_dict['altg'] = adsb.altitude(msg)
                 (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)

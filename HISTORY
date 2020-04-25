@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sat Apr 25 15:38:50 UTC 2020
+# (c) Kazansky137 - Sat Apr 25 21:38:06 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -42,4 +42,5 @@
 2020 Apr 22 20;04 : devpos - e5b84e5 : Compute and print distance and bearing
 2020 Apr 23 00;09 : devpos - a8958bb : Merged config files to config.txt
 2020 Apr 24 19:18 : devpos - e89f4b0 : Alert based on Flights, improved outputs
-2020 Apr 25 17:38 : devpos -         : Bug corr in sh., skip null icao msgs
+2020 Apr 25 17:38 : devpos - 486ec64 : Bug corr in sh., skip null icao msgs
+2020 Apr 25 25:38 : devpos -         : Manage velocity speed, heading, rate

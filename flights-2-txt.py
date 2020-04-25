@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 25 15:38:50 UTC 2020
+# (c) Kazansky137 - Sat Apr 25 21:38:06 UTC 2020
 
 import alert
 from common import log, distance, bearing, load_config
@@ -16,7 +16,8 @@ icaocodes = importlib.import_module("icao-codes")
 class Flight():
 
     def __init__(self, _ic, _ts, _sq=None, _cs=None,
-                 _alt='0', _lat='0', _long='0'):
+                 _alt='0', _lat='0', _long='0',
+                 _speed='0', _head='0', _rocd='0'):
 
         self.params = {}
         load_config(self.params, "config/config.txt")
@@ -28,12 +29,15 @@ class Flight():
                      'cs': _cs,         # Call sign
                      'nm': 1}           # Number of messages
 
-        self.pos = {'alt_fs': int(_alt),      # Altitude first seen
-                    'alt_ls': int(_alt),      # "        last seen
-                    'alt_min': int(_alt),     # "        minimum
-                    'alt_max': int(_alt),     # "        maximum
-                    'lat_ls': float(_lat),    # "        maximum
-                    'long_ls': float(_long)}  # "        maximum
+        self.pos = {'alt_fs': int(_alt),      # Altitude  first seen
+                    'alt_ls': int(_alt),      # "         last seen
+                    'alt_min': int(_alt),     # "         minimum
+                    'alt_max': int(_alt),     # "         maximum
+                    'lat_ls': float(_lat),    # Latitude  last seen
+                    'long_ls': float(_long),  # Longitude last seen
+                    'speed_ls': int(_speed),  # Speed     last seen
+                    'head_ls': float(_head),  # heading   last seen
+                    'rocd_ls': int(_rocd)}    # Rate C/D  last seen
 
     def print(self, _file=sys.stdout):
         if _file == sys.stderr and (self.data['nm'] < 16 or
@@ -50,7 +54,7 @@ class Flight():
             bear = bearing(self.pos['lat_ls'], self.pos['long_ls'],
                            lat_ref, long_ref)
         fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}" + \
-              " {:9.5f} {:9.5f} {:5.1f} {:5.1f}°"
+              " {:9.5f} {:9.5f} {:5.1f} {:5.1f}° {:5.1f}°"
         print(fmt.format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),
               strftime("%d %H:%M:%S", gmtime(self.data['ls'])),
               self.data['ic'], str(self.data['sq']),
@@ -58,7 +62,8 @@ class Flight():
               self.data['ls'] - self.data['fs'],
               self.pos['alt_fs'], self.pos['alt_ls'],
               self.pos['alt_min'], self.pos['alt_max'],
-              self.pos['lat_ls'], self.pos['long_ls'], dist, bear), file=_file)
+              self.pos['lat_ls'], self.pos['long_ls'],
+              dist, bear, self.pos['head_ls']), file=_file)
 
     def __lt__(self, other):
         # Order by last seen
@@ -96,7 +101,8 @@ class FlightList():
         return cnt
 
     def addupd_flight(self, _ts, _ic, _sq=None, _cs=None,
-                      _alt='0', _lat='0', _long='0'):
+                      _alt='0', _lat='0', _long='0',
+                      _speed='0', _head='0', _rocd='0'):
         if self.signal_hup == 1:
             self.signal_hup = 0
             self.alerts.reload()
@@ -173,6 +179,11 @@ class FlightList():
                     flx.pos['long_ls'] = float(_long)
                     # log("Update POS", flx.data, flx.pos)
 
+                # Velocity change do not create flights
+                #   Update permanently
+                if _head != '0':
+                    flx.pos['head_ls'] = float(_head)
+
                 flx.data['ls'] = float(_ts)
                 flx.data['nm'] = flx.data['nm'] + 1
 
@@ -236,11 +247,14 @@ if __name__ == "__main__":
                 fl.addupd_flight(words[1], words[3], _sq=words[4])
             elif words[0] == "CS":
                 fl.addupd_flight(words[1], words[3], _cs=words[5])
-            elif words[0] in ["AL"]:
+            elif words[0] == "AL":
                 fl.addupd_flight(words[1], words[3], _alt=words[4])
             elif words[0] in ["LB", "LG"]:
                 fl.addupd_flight(words[1], words[3], _alt=words[4],
                                  _lat=words[5], _long=words[6])
+            elif words[0] == "VH":
+                fl.addupd_flight(words[1], words[3], _speed=words[4],
+                                 _head=words[5], _rocd=words[6])
 
         except Exception as e:
             log("Exception:", e)
