@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
+# (c) Kazansky137 - Sat Apr 25 21:38:06 UTC 2020
 
 import sys
 import os
@@ -75,6 +75,13 @@ class MyClient(TcpClient):
                     fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:9.5f} {:9.5f}"
                     print(fmt.format
                           ("LB", ts, msg, icao, alt, lat, long), flush=True)
+                elif tc == 19:
+                    speed = adsb['speed']
+                    head = adsb['head']
+                    rocd = adsb['rocd']
+                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:5.1f} {:d}"
+                    print(fmt.format
+                          ("VH", ts, msg, icao, speed, head, rocd), flush=True)
                 elif 20 <= tc <= 22:
                     alt = adsb['altg']
                     lat = adsb['lat']

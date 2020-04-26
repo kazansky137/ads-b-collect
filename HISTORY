@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sun Apr 26 17:26:43 CEST 2020
+# (c) Kazansky137 - Sun Apr 26 17:56:54 CEST 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -50,4 +50,5 @@
 2020 Apr 25 17:38 : devpos - 486ec64 : Bug corr in sh., skip null icao msgs
 2020 Apr 25 18:05 : master - 6ed91f1 : Merge branch 'devpos' @486ec64
 2020 Apr 25 23:41 : devpos - 1704580 : Manage velocity speed, heading, rate
-2020 Apr 26 17:26 : master -         : Updated HISTORY and TREE files
+2020 Apr 26 17:26 : master - 2d36c39 : Updated HISTORY and TREE files
+2020 Apr 26 17:56 : master -         : Merge branch 'devpos' @1704580
