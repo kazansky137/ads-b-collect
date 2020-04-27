@@ -1,16 +1,21 @@
-# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
+
+# source
+addr : 12.3.4.567
+port : 12345
+type : raw
+pref : ALERT ABC-DE
 
 # reference position
-lat  : 50.55413
-long : 4.68801
+lat    : 12.abcde
+long   : 1.abcde
 
 # rinring
-apiKey : 8325BF10-59D2-423B-B2EF-43AB2AA6229F
-phone  : 0475/56.58.76
-prefix : ALERT GBX-SE
+apiKey : 12345678-XXXX-YYYY-ZZZZ-987654A61234
+phone  : 0486/xx.yy.zz
 
 # sendmail
-server : smtp.skynet.be
-from   : alert@belradar24.be
-reply  : info@belradar24.be
-to     : alain.ninane@uclouvain.be
+server : smtp.abcdef.tl
+from   : alert@abcdef.tl
+reply  : info@abcdef.tl
+to     : john.doe@abcdef.tl

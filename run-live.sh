@@ -1,10 +1,6 @@
 :
 
-# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
-
-# Input messages source
-  src1090="10.0.0.97 30002 raw"
-# src1090="10.0.0.28 30002 raw"
+# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
 
 # Various output files
   outfile=messages-$(date -u +%y%m%d-%H%M%S).txt
@@ -15,7 +11,7 @@
 # Environment variable for nice justified colored output
   export TERM_COLS=$(tput cols)
 
-  ./collect-2-txt.py $src1090 2>> $runfile | \
+  ./collect-2-txt.py 2>> $runfile | \
 		tee $outfile | ./flights-2-txt.py > $flgfile 2>> $runfile &
   
   sleep 1

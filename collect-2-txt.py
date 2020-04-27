@@ -1,13 +1,14 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 25 21:38:06 UTC 2020
+# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
 
 import sys
 import os
 import signal
 import atexit
+import json
 
-from common import log, adsb_ca
+from common import log, adsb_ca, load_config
 from time import time
 
 from pyModeS.extra.tcpclient import TcpClient
@@ -110,9 +111,12 @@ if __name__ == "__main__":
 
     log("Running: Pid {:5d}".format(os.getpid()))
 
-    host = sys.argv[1]
-    port = int(sys.argv[2])
-    type = sys.argv[3]
+    params = {}
+    load_config(params, "config/config.txt")
+
+    host = params['addr']
+    port = params['port']
+    type = params['type']
 
     client = MyClient(_host=host, _port=port, _datatype=type)
     client.run()

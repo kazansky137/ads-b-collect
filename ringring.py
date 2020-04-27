@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
 
 import sys
 import requests
@@ -15,7 +15,7 @@ class RingRing():
         return
 
     def send(self, _msg):
-        _msg = self.params["prefix"] + " " + _msg
+        _msg = self.params["pref"] + " " + _msg
         values = {"apiKey":     self.params["apiKey"],
                   "to":         self.params["phone"],
                   "message":    _msg

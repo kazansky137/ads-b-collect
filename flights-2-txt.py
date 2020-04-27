@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 25 21:38:06 UTC 2020
+# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
 
 import alert
 from common import log, distance, bearing, load_config
@@ -41,7 +41,7 @@ class Flight():
 
     def print(self, _file=sys.stdout):
         if _file == sys.stderr and (self.data['nm'] < 16 or
-           (time() - self.data['ls']) > 1800):
+           (time() - self.data['ls']) > 120):
             return
 
         lat_ref = float(self.params["lat"])

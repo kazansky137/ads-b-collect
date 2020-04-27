@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
 
 import sys
 import os
@@ -23,7 +23,7 @@ class SendMail():
         msg['From'] = self.params["from"]
         msg['To'] = self.params["to"]
         msg['Reply-To'] = self.params["reply"]
-        msg['Subject'] = self.params["prefix"] + ": " + _subj
+        msg['Subject'] = self.params["pref"] + ": " + _subj
         msg.set_content(_msg)
         smtp.send_message(msg)
         smtp.quit()
