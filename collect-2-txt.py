@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
+# (c) Kazansky137 - Wed Apr 29 20:21:45 UTC 2020
 
 import sys
 import os
@@ -8,11 +8,11 @@ import signal
 import atexit
 import json
 
-from common import log, adsb_ca, load_config
+from common import log, load_config
 from time import time
 
 from pyModeS.extra.tcpclient import TcpClient
-from discover import Discover
+from tsmessage import TsMessage
 
 
 class MyClient(TcpClient):
@@ -25,7 +25,13 @@ class MyClient(TcpClient):
     def __init__(self, _host, _port, _datatype):
         TcpClient.__init__(self, _host, _port, _datatype)
 
-        self.discover = Discover()
+        # Messages counters
+        self.msgs_curr_total = 0
+        self.msgs_last_total = 0
+
+        # Time counters
+        self.t_curr = time()
+        self.t_last = time()
 
         # Signals handling
         self.signal_hup = 0
@@ -33,73 +39,37 @@ class MyClient(TcpClient):
         signal.signal(signal.SIGHUP, self.handler_hup)
         signal.signal(signal.SIGINT, self.handler_int)
 
-    def handle_messages(self, _messages):
-        for msg, ts in _messages:
-            adsb = self.discover.message(msg)
-            # log(adsb)
-            if adsb['ret'] < 0:
-                continue
+    def logstats(self):
+        # Time
+        self.t_last = self.t_curr
+        self.t_curr = time()
+        self.t_diff = self.t_curr - self.t_last
 
+        # Messages
+        delta_total = self.msgs_curr_total - self.msgs_last_total
+        delta_total = int(delta_total / self.t_diff)
+        self.msgs_last_total = self.msgs_curr_total
+
+        log("Running   : Raw Read  {:>12,d} messages ({:5d} /s)"
+            .format(self.msgs_last_total, int(delta_total)))
+
+    def handle_messages(self, _ts_messages):
+        for _msg, _ts in _ts_messages:
             # Exit on SIGINT
             if self.signal_int == 1:
                 self.signal_int = 0
-                self.discover.logstat()
+                self.logstats()
                 sys.exit(1)
 
             # Printout of statistics
             if self.signal_hup == 1:
+                self.logstats()
                 self.signal_hup = 0
-                self.discover.logstat()
 
-            if(len(msg) == 26 or len(msg) == 40):
-                # Some version of dump1090 have the 12 first characters used w/
-                # some date (timestamp ?). E.g. sdbr245 feeding flightradar24.
-                # Strip 12 first characters.
-                msg = msg[12:]
+            ts_msg = TsMessage(_ts, _msg)
+            ts_msg.print_raw()
 
-            dfmt = adsb['dfmt']
-            icao = adsb['ic']
-
-            # Aircraft identification
-            if dfmt == 17 or dfmt == 18:    # Downlink format 17 or 18
-
-                tc = adsb['tc']
-                if tc == 4:          # Type code
-                    cs = adsb['cs']
-                    ca = self.discover.ca_txt(adsb_ca(msg))
-                    print("{:3s} {:15.9f} {:s} {:s} {:s} {:s}".format
-                          ("CS", ts, msg, icao, ca, cs), flush=True)
-                elif 9 <= tc <= 18:
-                    alt = adsb['altb']
-                    lat = adsb['lat']
-                    long = adsb['long']
-                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:9.5f} {:9.5f}"
-                    print(fmt.format
-                          ("LB", ts, msg, icao, alt, lat, long), flush=True)
-                elif tc == 19:
-                    speed = adsb['speed']
-                    head = adsb['head']
-                    rocd = adsb['rocd']
-                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:5.1f} {:d}"
-                    print(fmt.format
-                          ("VH", ts, msg, icao, speed, head, rocd), flush=True)
-                elif 20 <= tc <= 22:
-                    alt = adsb['altg']
-                    lat = adsb['lat']
-                    long = adsb['long']
-                    fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:9.5f} {:9.5f}"
-                    print(fmt.format
-                          ("LG", ts, msg, icao, alt, lat, long), flush=True)
-
-            elif dfmt in [5, 21]:
-                    sq = adsb['sq']
-                    print("{:3s} {:15.9f} {:s} {:s} {:s}".format
-                          ("SQ", ts, msg, icao, sq), flush=True)
-
-            if dfmt in [0, 4, 16, 20]:
-                alt = adsb['alt']
-                print("{:3s} {:15.9f} {:s} {:s} {:d}".format
-                      ("AL", ts, msg, icao, alt), flush=True)
+            self.msgs_curr_total = self.msgs_curr_total + 1
 
 
 def handler_atexit():

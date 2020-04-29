@@ -1,6 +1,7 @@
 *.bak
 flights-*.txt
 log-*.txt
+txt-*.txt
 messages-*.txt
 archives/
 aircrafts/

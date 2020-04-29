@@ -1,12 +1,15 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat Apr 25 21:38:06 UTC 2020
+# (c) Kazansky137 - Wed Apr 29 20:21:45 UTC 2020
 
 import sys
 import os
 from time import time
 from common import log, adsb_ca, load_config
 from pyModeS import common, adsb
+from tsmessage import TsMessage
+import traceback
+import signal
 
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
@@ -88,10 +91,14 @@ tc_msg = ["Aircraft identification",                   # 01
 
 
 class Discover:
+    def handler_hup(self, _signum, _frame):
+        self.signal_hup = 1
 
     def __init__(self):
         self.params = {}
         load_config(self.params, "config/config.txt")
+
+        self.msgs_discovered = 0
 
         self.msgs_curr_total = 0
         self.msgs_curr_len28 = 0
@@ -115,11 +122,22 @@ class Discover:
         self.t_curr = time()
         self.t_last = time()
 
+        # Signals handling
+        self.signal_hup = 0
+        signal.signal(signal.SIGHUP, self.handler_hup)
+
     def ca_txt(self, index):
         return ca_msg[index]
 
     def message(self, msg):
+        # Printout of statistics
+        if self.signal_hup == 1:
+            self.logstats()
+            self.signal_hup = 0
+
         ret_dict = {}
+        ret_dict['ret'] = 0
+        ret_dict['type'] = ""
 
         self.msgs_curr_total = self.msgs_curr_total + 1
 
@@ -159,34 +177,45 @@ class Discover:
             long_ref = float(self.params["long"])
 
             if tc == 4:         # Aircraft identification
+                self.msgs_discovered = self.msgs_discovered + 1
+                ret_dict['type'] = "CS"
                 ret_dict['cs'] = adsb.callsign(msg)
                 ca = adsb_ca(msg)
-                ret_dict['ca'] = ca
+                ret_dict['ca'] = ca_msg[ca]
                 self.ca[ca] = self.ca[ca] + 1
             elif 9 <= tc <= 18:
+                self.msgs_discovered = self.msgs_discovered + 1
+                ret_dict['type'] = "LB"
                 ret_dict['altb'] = adsb.altitude(msg)
                 (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)
                 ret_dict['lat'] = lat
                 ret_dict['long'] = long
             elif tc == 19:
-                (ret_dict['speed'], ret_dict['head'], ret_dict['rocd'], var) \
-                 = adsb.velocity(msg)
+                self.msgs_discovered = self.msgs_discovered + 1
+                ret_dict['type'] = "VH"
+                (ret_dict['speed'], ret_dict['head'],
+                 ret_dict['rocd'], var) = adsb.velocity(msg)
             elif 20 <= tc <= 22:
+                self.msgs_discovered = self.msgs_discovered + 1
+                ret_dict['type'] = "LG"
                 ret_dict['altg'] = adsb.altitude(msg)
                 (lat, long) = adsb.position_with_ref(msg, lat_ref, long_ref)
                 ret_dict['lat'] = lat
                 ret_dict['long'] = long
         elif dfmt in [5, 21]:
+                self.msgs_discovered = self.msgs_discovered + 1
+                ret_dict['type'] = "SQ"
                 ret_dict['sq'] = common.idcode(msg)
 
         if dfmt in [0, 4, 16, 20]:
+            self.msgs_discovered = self.msgs_discovered + 1
+            ret_dict['type'] = "AL"
             alt = common.altcode(msg)
             ret_dict['alt'] = alt
 
-        ret_dict['ret'] = 0
         return ret_dict
 
-    def logstat(self):
+    def logstats(self):
         # Time
         self.t_last = self.t_curr
         self.t_curr = time()
@@ -211,6 +240,9 @@ class Discover:
             .format(self.msgs_last_len28, int(delta_len28)))
         log("Running   : Raw Read  {:>12,d} msgshort ({:5d} /s)"
             .format(self.msgs_last_short, int(delta_short)))
+
+        log("Running   : Raw Read  {:>12,d} discovered"
+            .format(self.msgs_discovered))
 
         log("Running   : Raw Read  {:>12,d} check ok"
             .format(self.parity_check_ok))
@@ -261,8 +293,17 @@ if __name__ == "__main__":
         cnt = cnt + 1
         # log("Read", line, end='')
         words = line.split()
-        disc.message(words[1])
+        try:
+            ts_msg = TsMessage(words[0], words[1])
+            ts_msg.disc(disc.message(words[1]))
+            # ts_msg.print()
+            ts_msg.print_legacy()
 
-    disc.logstat()
+        except Exception as e:
+            log("Exception:", e)
+            log("         : Check input line {:10d}".format(cnt))
+            log(traceback.format_exc())
+
+    disc.logstats()
 
     sys.exit(0)
