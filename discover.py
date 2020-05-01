@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 29 20:21:45 UTC 2020
+# (c) Kazansky137 - Fri May  1 20:34:10 UTC 2020
 
 import sys
 import os
@@ -10,7 +10,6 @@ from pyModeS import common, adsb
 from tsmessage import TsMessage
 import traceback
 import signal
-
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Light",  # 1 - Light < 15500 lbs
@@ -115,8 +114,9 @@ class Discover:
         self.parity_check_ok = 0
         self.parity_check_ko = 0
 
-        self.check_legacy_ok = 0
-        self.check_legacy_ko = 0
+        self.exc_unavailable = 0
+        self.exc_missing = 0
+        self.exc_other = 0
 
         # Time counters
         self.t_curr = time()
@@ -125,6 +125,19 @@ class Discover:
         # Signals handling
         self.signal_hup = 0
         signal.signal(signal.SIGHUP, self.handler_hup)
+
+    def check_msg(self, msg):
+        df = common.df(msg)
+        msglen = len(msg)
+        if df == 17 and msglen == 28:
+            if common.crc(msg) == 0:
+                return True
+        elif df in [20, 21] and msglen == 28:
+            return True
+        elif df in [4, 5, 11] and msglen == 14:
+            return True
+        else:
+            return False
 
     def ca_txt(self, index):
         return ca_msg[index]
@@ -152,15 +165,12 @@ class Discover:
         else:
             self.msgs_curr_len28 = self.msgs_curr_len28 + 1
 
-        if common.crc(msg) == 0:
+        ret_dict['crc'] = self.check_msg(msg)
+        if ret_dict['crc']:
             self.parity_check_ok = self.parity_check_ok + 1
         else:
             self.parity_check_ko = self.parity_check_ko + 1
-
-        if common.crc_legacy(msg) == 0:
-            self.check_legacy_ok = self.check_legacy_ok + 1
-        else:
-            self.check_legacy_ko = self.check_legacy_ko + 1
+            ret_dict['ret'] = -1
 
         dfmt = common.df(msg)
         ret_dict['dfmt'] = dfmt
@@ -210,7 +220,8 @@ class Discover:
         if dfmt in [0, 4, 16, 20]:
             self.msgs_discovered = self.msgs_discovered + 1
             ret_dict['type'] = "AL"
-            alt = common.altcode(msg)
+            _alt = common.altcode(msg)
+            alt = _alt if _alt is not None else 0
             ret_dict['alt'] = alt
 
         return ret_dict
@@ -249,10 +260,12 @@ class Discover:
         log("Running   : Raw Read  {:>12,d} check ko"
             .format(self.parity_check_ko))
 
-        log("Running   : Raw Read  {:>12,d} check legacy ok"
-            .format(self.check_legacy_ok))
-        log("Running   : Raw Read  {:>12,d} check legacy ko"
-            .format(self.check_legacy_ko))
+        log("Running   : Raw Read  {:>12,d} exceptions resource unavailable"
+            .format(self.exc_unavailable))
+        log("Running   : Raw Read  {:>12,d} exceptions missing message"
+            .format(self.exc_missing))
+        log("Running   : Raw Read  {:>12,d} exceptions other"
+            .format(self.exc_other))
 
         s = 0
         for i in range(len(self.df)):
@@ -300,9 +313,17 @@ if __name__ == "__main__":
             ts_msg.print_legacy()
 
         except Exception as e:
-            log("Exception:", e)
-            log("         : Check input line {:10d}".format(cnt))
-            log(traceback.format_exc())
+            if words[0] == "Unexpected":
+                disc.exc_unavailable = disc.exc_unavailable + 1
+                log("Exception: Resource unavailable: line {:10d}".format(cnt))
+            elif len(words) == 1:
+                disc.exc_missing = disc.exc_missing + 1
+                log("Exception: Missing message: line {:10d}".format(cnt))
+            else:
+                disc.exc_other = disc.exc_other + 1
+                log("Exception:", e)
+                log("         : Check input line {:10d}".format(cnt))
+                log(traceback.format_exc())
 
     disc.logstats()
 

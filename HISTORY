@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Wed Apr 29 20:21:45 UTC 2020
+# (c) Kazansky137 - Fri May  1 20:34:10 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -54,4 +54,5 @@
 2020 Apr 26 17:56 : master - ded6657 : Merge branch 'devpos' @1704580
 2020 Apr 26 18:50 : master - 226ad12 : Updated HISTORY and TREE files
 2020 Apr 26 20:29 : devout - ecdc627 : Moved src details to config.txt
-2020 Apr 29 22:21 : devout -         : Discover is now kt's own process
+2020 Apr 29 22:21 : devout - 1a7a5a4 : Discover is now it's own process
+2020 May 01       : devout -         : Improved mgmt of exceptions & check_msg
