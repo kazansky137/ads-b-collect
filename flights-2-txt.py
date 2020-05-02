@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
+# (c) Kazansky137 - Sat May  2 17:10:56 UTC 2020
 
 import alert
 from common import log, distance, bearing, load_config
@@ -51,8 +51,8 @@ class Flight():
         if self.pos['lat_ls'] != 0.0 and self.pos['long_ls'] != 0.0:
             dist = distance(self.pos['lat_ls'], self.pos['long_ls'],
                             lat_ref, long_ref)
-            bear = bearing(self.pos['lat_ls'], self.pos['long_ls'],
-                           lat_ref, long_ref)
+            bear = bearing(lat_ref, long_ref, self.pos['lat_ls'],
+                           self.pos['long_ls'])
         fmt = "{:s} " * 4 + "{:>8s} {:5d} {:7.1f}" + 4 * " {:5d}" + \
               " {:9.5f} {:9.5f} {:5.1f} {:5.1f}° {:5.1f}°"
         print(fmt.format(strftime("%d %H:%M:%S", gmtime(self.data['fs'])),

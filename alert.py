@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 22:09:50 UTC 2020
+# (c) Kazansky137 - Sat May  2 17:10:56 UTC 2020
 
 from common import log, load, distance, bearing, load_config
 import sys
@@ -105,8 +105,8 @@ class AlertList():
                 if fl.pos['lat_ls'] != 0.0 and fl.pos['long_ls'] != 0.0:
                     dist = distance(fl.pos['lat_ls'],
                                     fl.pos['long_ls'], lat_ref, long_ref)
-                    bear = bearing(fl.pos['lat_ls'],
-                                   fl.pos['long_ls'], lat_ref, long_ref)
+                    bear = bearing(lat_ref, long_ref, fl.pos['lat_ls'],
+                                   fl.pos['long_ls'])
                 else:
                     dist = bear = 0.0
                 alert.log(fl.data['ls'], fl.data['ic'],

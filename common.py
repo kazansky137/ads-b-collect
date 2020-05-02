@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 22 18:04:12 UTC 2020
+# (c) Kazansky137 - Sat May  2 17:10:56 UTC 2020
 
 import io
 import os
@@ -9,6 +9,7 @@ import re
 import math
 from time import gmtime, strftime
 from pyModeS import common
+import pyModeS.extra.aero as aero
 
 
 def log(*args, _ts=None, _col=None, _file=sys.stderr, **kwargs):
@@ -134,32 +135,12 @@ def adsb_ca(_msg):
 
 
 def distance(lat1, long1, lat2, long2):
-    R = 6372800  # Earth radius in meters
-
-    phi1, phi2 = math.radians(lat1), math.radians(lat2)
-    dphi = math.radians(lat2 - lat1)
-    dlambda = math.radians(long2 - long1)
-
-    a = math.sin(dphi/2)**2 + \
-        math.cos(phi1) * math.cos(phi2) * math.sin(dlambda/2)**2
-
-    c = 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-    return c/1852.0
+    dist = aero.distance(lat1, long1, lat2, long2)
+    return dist/1852.0
 
 
 def bearing(lat1, lon1, lat2, lon2):
-    lat1, lat2 = math.radians(lat1), math.radians(lat2)
-
-    dlon = math.radians(lon2 - lon1)
-
-    y = math.sin(dlon) * math.cos(lat2)
-    x = math.cos(lat1) * math.sin(lat2) - \
-        (math.sin(lat1) * math.cos(lat2) * math.cos(dlon))
-
-    brng = math.degrees(math.atan2(y, x))
-
-    return (brng + 180) % 360
+    return aero.bearing(lat1, lon1, lat2, lon2)
 
 
 if __name__ == "__main__":
