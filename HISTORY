@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sat May  2 17:10:56 UTC 2020
+# (c) Kazansky137 - Sat May  2 19:25:37 CEST 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -56,4 +56,5 @@
 2020 Apr 26 20:29 : devout - ecdc627 : Moved src details to config.txt
 2020 Apr 29 22:21 : devout - 1a7a5a4 : Discover is now it's own process
 2020 May 01 22:34 : devout - 3edf8a2 : Improved mgmt of exceptions & check_msg
-2020 May 02 19:10 : devout -         : Distance and bearing from pyModeS aero
+2020 May 02 19:10 : devout - 7fb838e : Distance and bearing from pyModeS aero
+2020 May 02 19:25 : master -         : Merge branch 'devout' @7fb838e
