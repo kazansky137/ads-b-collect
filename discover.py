@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri May  1 20:34:10 UTC 2020
+# (c) Kazansky137 - Sun May  3 19:40:32 UTC 2020
 
 import sys
 import os
@@ -304,7 +304,7 @@ if __name__ == "__main__":
 
     for line in sys.stdin:
         cnt = cnt + 1
-        # log("Read", line, end='')
+#       log("Read", line, end='')
         words = line.split()
         try:
             ts_msg = TsMessage(words[0], words[1])
@@ -313,7 +313,7 @@ if __name__ == "__main__":
             ts_msg.print_legacy()
 
         except Exception as e:
-            if words[0] == "Unexpected":
+            if words[0] in ["Unexpected", "Error:"]:
                 disc.exc_unavailable = disc.exc_unavailable + 1
                 log("Exception: Resource unavailable: line {:10d}".format(cnt))
             elif len(words) == 1:

@@ -31,9 +31,9 @@
   fi
 
 # Various output files
-  flgfile=flights-${BASH_REMATCH[2]}.txt
-  runfile=log-${BASH_REMATCH[2]}.txt
-  txtfile=txt-${BASH_REMATCH[2]}.txt 
+  flgfile=flights-${BASH_REMATCH[2]}.upd.txt
+  runfile=log-${BASH_REMATCH[2]}.upd.txt
+  txtfile=txt-${BASH_REMATCH[2]}.upd.txt 
 
 if [ -e $flgfile ]; then
   echo $0: file $flgfile is already existing
@@ -53,8 +53,9 @@ fi
 # Environment variable for nice justified colored output
   export TERM_COLS=$(tput cols)
 
-  $source | (./discover.py | tee $txtfile | \
-             ./flights-2-txt.py --sms=0 > $flgfile) 2> $runfile
+  $source | awk '{print $2, $3;}' | \
+	(./discover.py | tee $txtfile | \
+	 ./flights-2-txt.py --sms=0 > $flgfile) 2> $runfile
   touch -r $in_file $flgfile $runfile $txtfile
   
 exit
