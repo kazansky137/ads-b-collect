@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sun May  3 19:40:32 UTC 2020
+# (c) Kazansky137 - Tue May  5 20:38:51 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -58,4 +58,5 @@
 2020 May 01 22:34 : devout - 3edf8a2 : Improved mgmt of exceptions & check_msg
 2020 May 02 19:10 : devout - 7fb838e : Distance and bearing from pyModeS aero
 2020 May 02 19:25 : master - b2e0250 : Merge branch 'devout' @7fb838e
-2020 May 03 21:40 : devout -         : Handle args sms, added run-legacy.sh
+2020 May 03 21:40 : devout - f101c5b : Handle args sms, added run-legacy.sh
+2020 May 05 22:38 : devout -         : Updated handling of exceptions + --debug
