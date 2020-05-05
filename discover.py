@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Fri May  1 20:34:10 UTC 2020
+# (c) Kazansky137 - Tue May  5 20:38:51 UTC 2020
 
 import sys
 import os
@@ -99,10 +99,12 @@ class Discover:
 
         self.msgs_discovered = 0
 
+        self.msgs_curr_rread = 0
         self.msgs_curr_total = 0
         self.msgs_curr_len28 = 0
         self.msgs_curr_short = 0
 
+        self.msgs_last_rread = 0
         self.msgs_last_total = 0
         self.msgs_last_len28 = 0
         self.msgs_last_short = 0
@@ -116,6 +118,8 @@ class Discover:
 
         self.exc_unavailable = 0
         self.exc_missing = 0
+        self.exc_velocity = 0
+        self.exc_crc_ko = 0
         self.exc_other = 0
 
         # Time counters
@@ -170,7 +174,10 @@ class Discover:
             self.parity_check_ok = self.parity_check_ok + 1
         else:
             self.parity_check_ko = self.parity_check_ko + 1
-            ret_dict['ret'] = -1
+
+        # Do not manage messages with bad CRC
+        if ret_dict['crc'] is not True:
+            raise ValueError("CrcKO")
 
         dfmt = common.df(msg)
         ret_dict['dfmt'] = dfmt
@@ -203,8 +210,11 @@ class Discover:
             elif tc == 19:
                 self.msgs_discovered = self.msgs_discovered + 1
                 ret_dict['type'] = "VH"
+                _dict = adsb.velocity(msg)
+                if _dict is None:
+                    raise ValueError("AdsbVelocity")
                 (ret_dict['speed'], ret_dict['head'],
-                 ret_dict['rocd'], var) = adsb.velocity(msg)
+                 ret_dict['rocd'], var) = _dict
             elif 20 <= tc <= 22:
                 self.msgs_discovered = self.msgs_discovered + 1
                 ret_dict['type'] = "LG"
@@ -233,18 +243,23 @@ class Discover:
         self.t_diff = self.t_curr - self.t_last
 
         # Messages
+        delta_rread = self.msgs_curr_rread - self.msgs_last_rread
         delta_total = self.msgs_curr_total - self.msgs_last_total
         delta_len28 = self.msgs_curr_len28 - self.msgs_last_len28
         delta_short = self.msgs_curr_short - self.msgs_last_short
 
+        delta_rread = int(delta_rread / self.t_diff)
         delta_total = int(delta_total / self.t_diff)
         delta_len28 = int(delta_len28 / self.t_diff)
         delta_short = int(delta_short / self.t_diff)
 
+        self.msgs_last_rread = self.msgs_curr_rread
         self.msgs_last_total = self.msgs_curr_total
         self.msgs_last_len28 = self.msgs_curr_len28
         self.msgs_last_short = self.msgs_curr_short
 
+        log("Running   : Raw Read  {:>12,d} raw read ({:5d} /s)"
+            .format(self.msgs_last_rread, int(delta_rread)))
         log("Running   : Raw Read  {:>12,d} messages ({:5d} /s)"
             .format(self.msgs_last_total, int(delta_total)))
         log("Running   : Raw Read  {:>12,d} msglen28 ({:5d} /s)"
@@ -264,7 +279,11 @@ class Discover:
             .format(self.exc_unavailable))
         log("Running   : Raw Read  {:>12,d} exceptions missing message"
             .format(self.exc_missing))
-        log("Running   : Raw Read  {:>12,d} exceptions other"
+        log("Running   : Raw Read  {:>12,d} exceptions missing velocity      *"
+            .format(self.exc_velocity))
+        log("Running   : Raw Read  {:>12,d} exceptions crc ko                *"
+            .format(self.exc_crc_ko))
+        log("Running   : Raw Read  {:>12,d} exceptions other                 ?"
             .format(self.exc_other))
 
         s = 0
@@ -304,26 +323,42 @@ if __name__ == "__main__":
 
     for line in sys.stdin:
         cnt = cnt + 1
-        # log("Read", line, end='')
+        if disc.params["debug"]:
+            log("Read", line, end='')
+        disc.msgs_curr_rread = disc.msgs_curr_rread + 1
         words = line.split()
         try:
             ts_msg = TsMessage(words[0], words[1])
-            ts_msg.disc(disc.message(words[1]))
-            # ts_msg.print()
-            ts_msg.print_legacy()
+            ret_dict = disc.message(words[1])
+            if ret_dict['ret'] == 0:
+                ts_msg.disc(ret_dict)
+                # ts_msg.print()
+                ts_msg.print_legacy()
 
-        except Exception as e:
-            if words[0] == "Unexpected":
-                disc.exc_unavailable = disc.exc_unavailable + 1
-                log("Exception: Resource unavailable: line {:10d}".format(cnt))
-            elif len(words) == 1:
+        except IndexError as e:
+            if len(words) == 1:
                 disc.exc_missing = disc.exc_missing + 1
-                log("Exception: Missing message: line {:10d}".format(cnt))
+                log("Exception: line {:10d}: Missing message".format(cnt))
             else:
-                disc.exc_other = disc.exc_other + 1
-                log("Exception:", e)
-                log("         : Check input line {:10d}".format(cnt))
-                log(traceback.format_exc())
+                log("Exception: line {:10d}: {:s} {:s}".
+                    format(cnt, str(type(e)), str(e)))
+        except ValueError as e:
+            if words[0] in ["Unexpected", "Error:"]:
+                disc.exc_unavailable = disc.exc_unavailable + 1
+                log("Exception: line {:10d}: Resource unavailable".format(cnt))
+            elif str(e) == "AdsbVelocity":
+                disc.exc_velocity = disc.exc_velocity + 1
+                log("Exception: line {:10d}: Adsb velocity none".format(cnt))
+            elif str(e) == "CrcKO":
+                disc.exc_crc_ko = disc.exc_crc_ko + 1
+            else:
+                log("Exception: line {:10d}: {:s} {:s}".
+                    format(cnt, str(type(e)), str(e)))
+        except Exception as e:
+            disc.exc_other = disc.exc_other + 1
+            log("Exception: line {:10d}: {:s} {:s}".
+                format(cnt, str(type(e)), str(e)))
+            log(traceback.format_exc())
 
     disc.logstats()
 

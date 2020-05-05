@@ -1,6 +1,6 @@
 :
 
-# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
+# (c) Kazansky137 - Sun May  3 19:40:32 UTC 2020
 
 # Various output files
   outfile=messages-$(date -u +%y%m%d-%H%M%S).txt
@@ -13,7 +13,8 @@
   export TERM_COLS=$(tput cols)
 
   ./collect-2-txt.py 2>> $runfile | \
-		tee $outfile | (./discover.py | tee $txtfile | ./flights-2-txt.py > $flgfile) 2>> $runfile &
+		tee $outfile | (./discover.py | tee $txtfile | \
+			./flights-2-txt.py --sms=1 > $flgfile) 2>> $runfile &
   
   sleep 2
   head $runfile

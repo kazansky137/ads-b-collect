@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat May  2 17:10:56 UTC 2020
+# (c) Kazansky137 - Tue May  5 20:38:51 UTC 2020
 
 import io
 import os
@@ -10,6 +10,7 @@ import math
 from time import gmtime, strftime
 from pyModeS import common
 import pyModeS.extra.aero as aero
+import argparse
 
 
 def log(*args, _ts=None, _col=None, _file=sys.stderr, **kwargs):
@@ -68,7 +69,21 @@ def load_config(_dict, _filename):
             _dict[k.strip(' ')] = v.strip(' ')
             cnt = cnt + 1
         f.close()
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--sms", help="Send SMS for urgent alert",
+                            type=int, choices=[0, 1])
+        parser.add_argument("--debug", help="Debug messages",
+                            type=int, choices=[0, 1])
+        args = parser.parse_args()
+        _dict["sms"] = True if args.sms == 1 else False
+        _dict["debug"] = True if args.debug == 1 else False
+
     return cnt
+
+
+def print_config(_dict):
+    print(_dict)
 
 
 def xt_color_table():
@@ -166,5 +181,9 @@ if __name__ == "__main__":
     """
     xt_color_table()
     """
+
+    config = {}
+    load_config(config, "config/config.txt")
+    print_config(config)
 
     sys.exit(0)
