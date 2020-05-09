@@ -1,15 +1,12 @@
 :
 
-# (c) Kazansky137 - Tue May  5 20:38:51 UTC 2020
+# (c) Kazansky137 - Sat May  9 21:27:18 UTC 2020
 
-  pid=$(ps xu | grep ./collect-2-txt.py | grep -v grep | awk '{print $2;}')
-  if [ ! -z $pid ]; then
-    kill -1 $pid
-  fi
+  progs="./collect-2-txt.py|./discover.py"
+  pids=$(ps xu | egrep $progs | grep -v grep | awk '{print $2;}')
 
-  pid=$(ps xu | grep ./discover.py | grep -v grep | awk '{print $2;}')
-  if [ ! -z $pid ]; then
+  for pid in $pids; do
     kill -1 $pid
-  fi
+  done
 
 exit
