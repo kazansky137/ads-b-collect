@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue May  5 20:38:51 UTC 2020
+# (c) Kazansky137 - Sun May 10 17:57:24 UTC 2020
 
 import sys
 import os
@@ -10,6 +10,8 @@ from pyModeS import common, adsb
 from tsmessage import TsMessage
 import traceback
 import signal
+import re
+from common import print_config
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Light",  # 1 - Light < 15500 lbs
@@ -320,9 +322,19 @@ if __name__ == "__main__":
 
     disc = Discover()
     cnt = 0
+    first_line = True
 
     for line in sys.stdin:
-        cnt = cnt + 1
+        if first_line:
+            first_line = False
+            regex = re.compile('(%MBR24-[1-3].0) ([A-Z\-]+)$')
+            result = regex.match(line)
+            if result is None:
+                raise ValueError("Invalid magic characters")
+            log(result.group(1), result.group(2))
+            disc.params['in_vers'] = result.group(1)
+            disc.params['in_name'] = result.group(2)
+            continue
         if disc.params["debug"]:
             log("Read", line, end='')
         disc.msgs_curr_rread = disc.msgs_curr_rread + 1

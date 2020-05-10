@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 29 20:21:45 UTC 2020
+# (c) Kazansky137 - Sun May 10 17:57:24 UTC 2020
 
 import sys
 import os
@@ -87,6 +87,8 @@ if __name__ == "__main__":
     host = params['addr']
     port = params['port']
     type = params['type']
+
+    print(params['vers'], params['name'])
 
     client = MyClient(_host=host, _port=port, _datatype=type)
     client.run()
