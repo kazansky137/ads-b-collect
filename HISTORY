@@ -1,7 +1,7 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sat May  9 23:41:48 CEST 2020
-#
+# (c) Kazansky137 - Mon May 11 20:45:32 UTC 2020
+
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
 2019 Dec 11 11:42 : devout - 26b700e : Bugs correction
@@ -62,4 +62,6 @@
 2020 May 05 22:38 : devout - a4962b9 : Updated handling of exceptions + --debug
 2020 May 05 22:48 : master - 69e2d78 : Merge branch 'devout' @a4962b9
 2020 May 09 23:27 : devout - 6cb253a : Added magic typed legacy files
-2020 May 09 23:41 : master -         : Merge branch 'devout' @6cb253a
+2020 May 09 23:41 : master - 00bd8d2 : Merge branch 'devout' @6cb253a
+2020 May 10 19:58 : devout - 7b502d6 : Use of magic characters in collect/disc.
+2020 May 11 22:45 : devout -         : Updated run-file.sh to run legacy files

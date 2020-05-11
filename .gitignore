@@ -7,5 +7,5 @@ archives/
 aircrafts/
 config/alerts.txt
 tests/
-config/config.txt
+config/config*.txt
 __pycache__/
