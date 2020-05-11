@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sun May 10 17:57:24 UTC 2020
+# (c) Kazansky137 - Mon May 11 20:45:32 UTC 2020
 
 import sys
 import os
@@ -334,14 +334,26 @@ if __name__ == "__main__":
             log(result.group(1), result.group(2))
             disc.params['in_vers'] = result.group(1)
             disc.params['in_name'] = result.group(2)
+            if disc.params['in_vers'] == "%MBR24-3.0":
+                word_one = 0
+                word_two = 1
+            elif disc.params['in_vers'] == "%MBR24-2.0":
+                word_one = 1
+                word_two = 2
+            elif disc.params['in_vers'] == "%MBR24-1.0":
+                word_one = 0
+                word_two = 1
+            else:
+                raise ValueError("Invalid input version")
             continue
+        cnt = cnt + 1
         if disc.params["debug"]:
             log("Read", line, end='')
         disc.msgs_curr_rread = disc.msgs_curr_rread + 1
         words = line.split()
         try:
-            ts_msg = TsMessage(words[0], words[1])
-            ret_dict = disc.message(words[1])
+            ts_msg = TsMessage(words[word_one], words[word_two])
+            ret_dict = disc.message(words[word_two])
             if ret_dict['ret'] == 0:
                 ts_msg.disc(ret_dict)
                 # ts_msg.print()
@@ -350,26 +362,30 @@ if __name__ == "__main__":
         except IndexError as e:
             if len(words) == 1:
                 disc.exc_missing = disc.exc_missing + 1
-                log("Exception: line {:10d}: Missing message".format(cnt))
+                log("Exception: line {:10d}: Missing message".format(cnt+1))
             else:
                 log("Exception: line {:10d}: {:s} {:s}".
                     format(cnt, str(type(e)), str(e)))
         except ValueError as e:
             if words[0] in ["Unexpected", "Error:"]:
                 disc.exc_unavailable = disc.exc_unavailable + 1
-                log("Exception: line {:10d}: Resource unavailable".format(cnt))
+                log("Exception: line {:10d}: Resource unavailable"
+                    .format(cnt+1))
             elif str(e) == "AdsbVelocity":
                 disc.exc_velocity = disc.exc_velocity + 1
-                log("Exception: line {:10d}: Adsb velocity none".format(cnt))
+                log("Exception: line {:10d}: Adsb velocity none".format(cnt+1))
             elif str(e) == "CrcKO":
                 disc.exc_crc_ko = disc.exc_crc_ko + 1
+                if disc.params["debug"]:
+                    log("Exception: line {:10d}: CRC check failure"
+                        .format(cnt+1))
             else:
                 log("Exception: line {:10d}: {:s} {:s}".
-                    format(cnt, str(type(e)), str(e)))
+                    format(cnt+1, str(type(e)), str(e)))
         except Exception as e:
             disc.exc_other = disc.exc_other + 1
             log("Exception: line {:10d}: {:s} {:s}".
-                format(cnt, str(type(e)), str(e)))
+                format(cnt+1, str(type(e)), str(e)))
             log(traceback.format_exc())
 
     disc.logstats()

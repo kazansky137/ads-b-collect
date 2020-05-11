@@ -1,11 +1,26 @@
 #! /bin/bash
 
-# (c) Kazansky137 - Sun May  3 19:40:32 UTC 2020
+# (c) Kazansky137 - Mon May 11 20:45:32 UTC 2020
 
-  if [ $# -ne 1 ]; then
-    echo Usage: $0 file.txt[.gz]
-    exit 1
-  fi
+  function usage()
+  { echo $0 [-h] [-f] dated_file.txt{.gz}
+    exit
+  }
+
+  while getopts "hf" option; do
+    case "${option}" in
+        h)
+            usage
+            ;;
+        f)
+            force=1
+            ;;
+        *)
+            usage
+            ;;
+    esac
+  done
+  shift "$((OPTIND-1))"
 
   in_file=$1
 
@@ -35,19 +50,21 @@
   runfile=log-${BASH_REMATCH[2]}.txt
   txtfile=txt-${BASH_REMATCH[2]}.txt 
 
-if [ -e $flgfile ]; then
-  echo $0: file $flgfile is already existing
-  exit 1
-fi
+if [ ! $force ]; then
+	if [ -e $flgfile ]; then
+  		echo $0: file $flgfile is already existing
+  		exit 1
+	fi
 
-if [ -e $runfile ]; then
-  echo $0: file $runfile is already existing
-  exit 1
-fi
+	if [ -e $runfile ]; then
+	  	echo $0: file $runfile is already existing
+ 	 	exit 1
+	fi
 
-if [ -e $txtfile ]; then
-  echo $0: file $txtfile is already existing
-  exit 1
+	if [ -e $txtfile ]; then
+  		echo $0: file $txtfile is already existing
+ 	 	exit 1
+	fi
 fi
 
 # Environment variable for nice justified colored output
