@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue May  5 20:38:51 UTC 2020
+# (c) Kazansky137 - Tue May 12 21:29:57 UTC 2020
 
 import io
 import os
@@ -73,11 +73,20 @@ def load_config(_dict, _filename):
         parser = argparse.ArgumentParser()
         parser.add_argument("--sms", help="Send SMS for urgent alert",
                             type=int, choices=[0, 1])
+        parser.add_argument("--mail", help="Send mail for all alerts",
+                            type=int, choices=[0, 1])
+        parser.add_argument("--alerts", help="Manage alerts (not implemented)",
+                            type=int, choices=[0, 1])
+        parser.add_argument("--live", help="Live/File mode (not implemented)",
+                            type=int, choices=[0, 1])
         parser.add_argument("--debug", help="Debug messages",
                             type=int, choices=[0, 1])
         args = parser.parse_args()
-        _dict["sms"] = True if args.sms == 1 else False
-        _dict["debug"] = True if args.debug == 1 else False
+        _dict["arg_sms"] = True if args.sms == 1 else False
+        _dict["arg_debug"] = True if args.debug == 1 else False
+        _dict["arg_mail"] = True if args.mail == 1 else False
+        _dict["arg_alerts"] = True if args.alerts == 1 else False
+        _dict["arg_live"] = True if args.live == 1 else False
 
     return cnt
 

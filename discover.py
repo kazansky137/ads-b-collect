@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon May 11 20:45:32 UTC 2020
+# (c) Kazansky137 - Tue May 12 21:29:57 UTC 2020
 
 import sys
 import os
@@ -347,7 +347,7 @@ if __name__ == "__main__":
                 raise ValueError("Invalid input version")
             continue
         cnt = cnt + 1
-        if disc.params["debug"]:
+        if disc.params["arg_debug"]:
             log("Read", line, end='')
         disc.msgs_curr_rread = disc.msgs_curr_rread + 1
         words = line.split()
@@ -369,14 +369,15 @@ if __name__ == "__main__":
         except ValueError as e:
             if words[0] in ["Unexpected", "Error:"]:
                 disc.exc_unavailable = disc.exc_unavailable + 1
-                log("Exception: line {:10d}: Resource unavailable"
-                    .format(cnt+1))
+                if disc.params["arg_debug"]:
+                    log("Exception: line {:10d}: Resource unavailable"
+                        .format(cnt+1))
             elif str(e) == "AdsbVelocity":
                 disc.exc_velocity = disc.exc_velocity + 1
                 log("Exception: line {:10d}: Adsb velocity none".format(cnt+1))
             elif str(e) == "CrcKO":
                 disc.exc_crc_ko = disc.exc_crc_ko + 1
-                if disc.params["debug"]:
+                if disc.params["arg_debug"]:
                     log("Exception: line {:10d}: CRC check failure"
                         .format(cnt+1))
             else:

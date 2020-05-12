@@ -4,6 +4,7 @@ log-*.txt
 txt-*.txt
 messages-*.txt
 archives/
+trash/
 aircrafts/
 config/alerts.txt
 tests/

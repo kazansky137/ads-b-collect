@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# (c) Kazansky137 - Mon May 11 20:45:32 UTC 2020
+# (c) Kazansky137 - Tue May 12 21:29:57 UTC 2020
 
   function usage()
   { echo $0 [-h] [-f] dated_file.txt{.gz}
@@ -71,7 +71,7 @@ fi
   export TERM_COLS=$(tput cols)
 
   $source | (./discover.py | tee $txtfile | \
-             ./flights-2-txt.py --sms=0 > $flgfile) 2> $runfile
+             ./flights-2-txt.py --sms=0 --mail=0 > $flgfile) 2> $runfile
   touch -r $in_file $flgfile $runfile $txtfile
   
 exit
