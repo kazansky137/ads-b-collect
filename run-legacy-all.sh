@@ -1,10 +1,9 @@
 :
 
-# (c) Kazansky137 - Mon May 11 20:45:32 UTC 2020
+# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
 
 for file in $(ls archives/messages*); do
-	echo $file
-	./run-file.sh $file
+	./run-file.sh $* $file
 done
 
 exit

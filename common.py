@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue May 12 21:29:57 UTC 2020
+# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
 
 import io
 import os
@@ -11,6 +11,7 @@ from time import gmtime, strftime
 from pyModeS import common
 import pyModeS.extra.aero as aero
 import argparse
+import pprint
 
 
 def log(*args, _ts=None, _col=None, _file=sys.stderr, **kwargs):
@@ -71,28 +72,39 @@ def load_config(_dict, _filename):
         f.close()
 
         parser = argparse.ArgumentParser()
-        parser.add_argument("--sms", help="Send SMS for urgent alert",
-                            type=int, choices=[0, 1])
-        parser.add_argument("--mail", help="Send mail for all alerts",
-                            type=int, choices=[0, 1])
-        parser.add_argument("--alerts", help="Manage alerts (not implemented)",
-                            type=int, choices=[0, 1])
-        parser.add_argument("--live", help="Live/File mode (not implemented)",
-                            type=int, choices=[0, 1])
         parser.add_argument("--debug", help="Debug messages",
                             type=int, choices=[0, 1])
+        parser.add_argument("--live", help="Live/File mode",
+                            type=int, choices=[1, 0])
+        parser.add_argument("--sms", help="Send SMS for urgent alert",
+                            type=int, choices=[1, 0])
+        parser.add_argument("--mail", help="Send mail for all alerts",
+                            type=int, choices=[1, 0])
+        parser.add_argument("--alerts", help="Manage alerts",
+                            type=int, choices=[1, 0])
         args = parser.parse_args()
-        _dict["arg_sms"] = True if args.sms == 1 else False
-        _dict["arg_debug"] = True if args.debug == 1 else False
-        _dict["arg_mail"] = True if args.mail == 1 else False
-        _dict["arg_alerts"] = True if args.alerts == 1 else False
-        _dict["arg_live"] = True if args.live == 1 else False
+        # Default values
+        # debug  = False
+        # live   = True	(if False: sms/mail/alerts = False - can be overwritten)
+        # sms    = True
+        # mail   = True
+        # alerts = True
+        _dict["arg_debug"]      = True if args.debug   == 1 else False
+        if args.live == 0:
+            _dict["arg_sms"]    = True if args.sms     == 1 else False
+            _dict["arg_mail"]   = True if args.mail    == 1 else False
+            _dict["arg_alerts"] = True if args.alerts  == 1 else False
+        else:
+            _dict["arg_sms"]    = False if args.sms    == 0 else True
+            _dict["arg_mail"]   = False if args.mail   == 0 else True
+            _dict["arg_alerts"] = False if args.alerts == 0 else True
 
     return cnt
 
 
 def print_config(_dict):
-    print(_dict)
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(_dict)
 
 
 def xt_color_table():

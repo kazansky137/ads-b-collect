@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Tue May 12 21:29:57 UTC 2020
+# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -66,4 +66,5 @@
 2020 May 10 19:58 : devout - 7b502d6 : Use of magic characters in collect/disc.
 2020 May 11 22:45 : devout - 6cd7616 : Updated run-file.sh to run legacy files
 2020 May 11 23:01 ; master - 0da0578 : Merge branch 'devout' @6cd7616
-2020 May 12 23:04 ; devout -         : Added args: mail alerts live
+2020 May 12 23:04 ; devout - 4358121 : Added args, mail alerts live
+2020 May 14 19:29 ; devout -         : Added args, mgmt exceptions, bad perf.

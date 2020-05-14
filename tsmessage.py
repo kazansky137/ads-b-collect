@@ -1,11 +1,15 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Wed Apr 29 20:21:45 UTC 2020
+# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+
+from common import log, load_config
 
 
 class TsMessage():
-
     def __init__(self, _ts, _msg):
+        self.params = {}
+        load_config(self.params, "config/config.txt")
+
         self.ts = float(_ts)
         self.msg = _msg
         self.adsb = {}
@@ -43,6 +47,8 @@ class TsMessage():
             speed = self.adsb['speed']
             head = self.adsb['head']
             rocd = self.adsb['rocd']
+            if self.params["arg_debug"]:
+                log("debug: ", speed, head, rocd)
             fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:5.1f} {:d}"
             print(fmt.format
                   ("VH", ts, msg, icao, speed, head, rocd), flush=True)
