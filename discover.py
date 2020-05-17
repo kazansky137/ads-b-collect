@@ -99,6 +99,8 @@ class Discover:
         self.params = {}
         load_config(self.params, "config/config.txt")
 
+        self.debug = 1 if self.params["arg_debug"] else 0
+
         self.msgs_discovered = 0
 
         self.msgs_curr_rread = 0
@@ -341,7 +343,7 @@ if __name__ == "__main__":
             result = regex.match(line)
             if result is None:
                 raise ValueError("Invalid magic characters")
-            if disc.params["arg_debug"]:
+            if disc.debug:
                 log(result.group(1), result.group(2))
             disc.params['in_vers'] = result.group(1)
             disc.params['in_name'] = result.group(2)
@@ -358,7 +360,7 @@ if __name__ == "__main__":
                 raise ValueError("Invalid input version")
             continue
 
-        if disc.params["arg_debug"]:
+        if disc.debug:
             log("Read", line, end='')
 
         if line[0] == '#':
@@ -369,7 +371,7 @@ if __name__ == "__main__":
 
         words = line.split()
         try:
-            ts_msg = TsMessage(words[word_one], words[word_two])
+            ts_msg = TsMessage(words[word_one], words[word_two], disc.debug)
             ret_dict = disc.message(words[word_two])
             if ret_dict['ret'] == 0:
                 ts_msg.disc(ret_dict)
@@ -379,7 +381,7 @@ if __name__ == "__main__":
         except IndexError as e:
             if len(words) == 1:
                 disc.exc_missing = disc.exc_missing + 1
-                if disc.params["arg_debug"]:
+                if disc.debug:
                     log("Exception: line {:10d}: Missing message"
                         .format(cnt+1))
             else:
@@ -388,7 +390,7 @@ if __name__ == "__main__":
         except ValueError as e:
             if words[0] in ["Unexpected", "Error:"]:
                 disc.exc_unavailable = disc.exc_unavailable + 1
-                if disc.params["arg_debug"]:
+                if disc.debug:
                     log("Exception: line {:10d}: Resource unavailable"
                         .format(cnt+1))
             elif str(e) == "AdsbVelocity":
@@ -402,7 +404,7 @@ if __name__ == "__main__":
                 log("Exception: line {:10d}: Adsb rocd none".format(cnt+1))
             elif str(e) == "CrcKO":
                 disc.exc_crc_ko = disc.exc_crc_ko + 1
-                if disc.params["arg_debug"]:
+                if disc.debug:
                     log("Exception: line {:10d}: CRC check failure"
                         .format(cnt+1))
             else:

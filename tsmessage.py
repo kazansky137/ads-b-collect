@@ -6,12 +6,10 @@ from common import log, load_config
 
 
 class TsMessage():
-    def __init__(self, _ts, _msg):
-        self.params = {}
-        load_config(self.params, "config/config.txt")
-
+    def __init__(self, _ts, _msg, _debug=0):
         self.ts = float(_ts)
         self.msg = _msg
+        self.debug = _debug
         self.adsb = {}
         self.adsb['ts'] = _ts
         return
@@ -47,7 +45,7 @@ class TsMessage():
             speed = self.adsb['speed']
             head = self.adsb['head']
             rocd = self.adsb['rocd']
-            if self.params["arg_debug"]:
+            if self.debug:
                 log("debug: ", speed, head, rocd)
             fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:5.1f} {:d}"
             print(fmt.format
