@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon Apr 27 16:04:53 UTC 2020
+# (c) Kazansky137 - Tue May 12 21:29:57 UTC 2020
 
 import sys
 import os
@@ -18,6 +18,8 @@ class SendMail():
         pass
 
     def send(self, _subj, _msg):
+        if self.params["arg_mail"] is False:
+            return
         smtp = smtplib.SMTP(self.params["server"])
         msg = EmailMessage()
         msg['From'] = self.params["from"]

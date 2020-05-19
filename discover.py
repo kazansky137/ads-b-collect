@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Mon May 11 20:45:32 UTC 2020
+# (c) Kazansky137 - Tue May 19 17:33:30 UTC 2020
 
 import sys
 import os
@@ -12,6 +12,8 @@ import traceback
 import signal
 import re
 from common import print_config
+
+_debug = 0
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Light",  # 1 - Light < 15500 lbs
@@ -99,6 +101,9 @@ class Discover:
         self.params = {}
         load_config(self.params, "config/config.txt")
 
+        global _debug
+        _debug = 1 if self.params["arg_debug"] else 0
+
         self.msgs_discovered = 0
 
         self.msgs_curr_rread = 0
@@ -112,17 +117,19 @@ class Discover:
         self.msgs_last_short = 0
 
         self.df = [0] * 32          # Downlink Format : 5 bits  1 ..  5
-        self.ca = [0] * 8           # capability      : 3 bits  6 ..  8
+        self.ca = [0] *  8          # Capability      : 3 bits  6 ..  8
         self.tc = [0] * 32          # Type Code       : 5 bits 33 .. 37
 
         self.parity_check_ok = 0
         self.parity_check_ko = 0
 
         self.exc_unavailable = 0
-        self.exc_missing = 0
-        self.exc_velocity = 0
-        self.exc_crc_ko = 0
-        self.exc_other = 0
+        self.exc_missing     = 0
+        self.exc_velocity    = 0
+        self.exc_heading     = 0
+        self.exc_rocd        = 0
+        self.exc_crc_ko      = 0
+        self.exc_other       = 0
 
         # Time counters
         self.t_curr = time()
@@ -217,6 +224,10 @@ class Discover:
                     raise ValueError("AdsbVelocity")
                 (ret_dict['speed'], ret_dict['head'],
                  ret_dict['rocd'], var) = _dict
+                if ret_dict['head'] is None:
+                    raise ValueError("AdsbHeading")
+                if ret_dict['rocd'] is None:
+                    raise ValueError("AdsbRocd")
             elif 20 <= tc <= 22:
                 self.msgs_discovered = self.msgs_discovered + 1
                 ret_dict['type'] = "LG"
@@ -283,6 +294,10 @@ class Discover:
             .format(self.exc_missing))
         log("Running   : Raw Read  {:>12,d} exceptions missing velocity      *"
             .format(self.exc_velocity))
+        log("Running   : Raw Read  {:>12,d} exceptions missing heading       *"
+            .format(self.exc_heading))
+        log("Running   : Raw Read  {:>12,d} exceptions missing rocd          *"
+            .format(self.exc_rocd))
         log("Running   : Raw Read  {:>12,d} exceptions crc ko                *"
             .format(self.exc_crc_ko))
         log("Running   : Raw Read  {:>12,d} exceptions other                 ?"
@@ -317,7 +332,6 @@ class Discover:
 
 
 if __name__ == "__main__":
-
     log("Running: Pid {:5d}".format(os.getpid()))
 
     disc = Discover()
@@ -331,7 +345,8 @@ if __name__ == "__main__":
             result = regex.match(line)
             if result is None:
                 raise ValueError("Invalid magic characters")
-            log(result.group(1), result.group(2))
+            if _debug:
+                log("debug first line:", result.group(1), result.group(2))
             disc.params['in_vers'] = result.group(1)
             disc.params['in_name'] = result.group(2)
             if disc.params['in_vers'] == "%MBR24-3.0":
@@ -346,10 +361,16 @@ if __name__ == "__main__":
             else:
                 raise ValueError("Invalid input version")
             continue
+
+        if _debug:
+            log("debug read:", line, end='')
+
+        if line[0] == '#':
+            continue
+
         cnt = cnt + 1
-        if disc.params["debug"]:
-            log("Read", line, end='')
         disc.msgs_curr_rread = disc.msgs_curr_rread + 1
+
         words = line.split()
         try:
             ts_msg = TsMessage(words[word_one], words[word_two])
@@ -362,22 +383,31 @@ if __name__ == "__main__":
         except IndexError as e:
             if len(words) == 1:
                 disc.exc_missing = disc.exc_missing + 1
-                log("Exception: line {:10d}: Missing message".format(cnt+1))
+                if _debug:
+                    log("debug exception: line {:10d}: Missing message"
+                        .format(cnt+1))
             else:
                 log("Exception: line {:10d}: {:s} {:s}".
                     format(cnt, str(type(e)), str(e)))
         except ValueError as e:
             if words[0] in ["Unexpected", "Error:"]:
                 disc.exc_unavailable = disc.exc_unavailable + 1
-                log("Exception: line {:10d}: Resource unavailable"
-                    .format(cnt+1))
+                if _debug:
+                    log("debug exception: line {:10d}: Resource unavailable"
+                        .format(cnt+1))
             elif str(e) == "AdsbVelocity":
                 disc.exc_velocity = disc.exc_velocity + 1
                 log("Exception: line {:10d}: Adsb velocity none".format(cnt+1))
+            elif str(e) == "AdsbHeading":
+                disc.exc_heading = disc.exc_heading + 1
+                log("Exception: line {:10d}: Adsb heading none".format(cnt+1))
+            elif str(e) == "AdsbRocd":
+                disc.exc_rocd = disc.exc_rocd + 1
+                log("Exception: line {:10d}: Adsb rocd none".format(cnt+1))
             elif str(e) == "CrcKO":
                 disc.exc_crc_ko = disc.exc_crc_ko + 1
-                if disc.params["debug"]:
-                    log("Exception: line {:10d}: CRC check failure"
+                if _debug:
+                    log("debug exception: line {:10d}: CRC check failure"
                         .format(cnt+1))
             else:
                 log("Exception: line {:10d}: {:s} {:s}".

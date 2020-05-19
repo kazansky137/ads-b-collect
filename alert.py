@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat May  2 17:10:56 UTC 2020
+# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
 
 from common import log, load, distance, bearing, load_config
 import sys
@@ -83,6 +83,8 @@ class AlertList():
             alert.print(_file=_file)
 
     def check(self, fl):
+        if self.params["arg_alerts"] is False:
+            return
         # log("Check Flight ", fl.data, fl.pos)
         # Alert delayed waiting for position or least 16 messages
         if fl.data['nm'] < 16:
