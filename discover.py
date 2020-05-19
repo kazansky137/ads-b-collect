@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+# (c) Kazansky137 - Tue May 19 17:33:30 UTC 2020
 
 import sys
 import os
@@ -12,6 +12,8 @@ import traceback
 import signal
 import re
 from common import print_config
+
+_debug = 0
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Light",  # 1 - Light < 15500 lbs
@@ -99,7 +101,8 @@ class Discover:
         self.params = {}
         load_config(self.params, "config/config.txt")
 
-        self.debug = 1 if self.params["arg_debug"] else 0
+        global _debug
+        _debug = 1 if self.params["arg_debug"] else 0
 
         self.msgs_discovered = 0
 
@@ -329,7 +332,6 @@ class Discover:
 
 
 if __name__ == "__main__":
-
     log("Running: Pid {:5d}".format(os.getpid()))
 
     disc = Discover()
@@ -343,8 +345,8 @@ if __name__ == "__main__":
             result = regex.match(line)
             if result is None:
                 raise ValueError("Invalid magic characters")
-            if disc.debug:
-                log(result.group(1), result.group(2))
+            if _debug:
+                log("debug first line:", result.group(1), result.group(2))
             disc.params['in_vers'] = result.group(1)
             disc.params['in_name'] = result.group(2)
             if disc.params['in_vers'] == "%MBR24-3.0":
@@ -360,8 +362,8 @@ if __name__ == "__main__":
                 raise ValueError("Invalid input version")
             continue
 
-        if disc.debug:
-            log("Read", line, end='')
+        if _debug:
+            log("debug read:", line, end='')
 
         if line[0] == '#':
             continue
@@ -371,7 +373,7 @@ if __name__ == "__main__":
 
         words = line.split()
         try:
-            ts_msg = TsMessage(words[word_one], words[word_two], disc.debug)
+            ts_msg = TsMessage(words[word_one], words[word_two])
             ret_dict = disc.message(words[word_two])
             if ret_dict['ret'] == 0:
                 ts_msg.disc(ret_dict)
@@ -381,8 +383,8 @@ if __name__ == "__main__":
         except IndexError as e:
             if len(words) == 1:
                 disc.exc_missing = disc.exc_missing + 1
-                if disc.debug:
-                    log("Exception: line {:10d}: Missing message"
+                if _debug:
+                    log("debug exception: line {:10d}: Missing message"
                         .format(cnt+1))
             else:
                 log("Exception: line {:10d}: {:s} {:s}".
@@ -390,8 +392,8 @@ if __name__ == "__main__":
         except ValueError as e:
             if words[0] in ["Unexpected", "Error:"]:
                 disc.exc_unavailable = disc.exc_unavailable + 1
-                if disc.debug:
-                    log("Exception: line {:10d}: Resource unavailable"
+                if _debug:
+                    log("debug exception: line {:10d}: Resource unavailable"
                         .format(cnt+1))
             elif str(e) == "AdsbVelocity":
                 disc.exc_velocity = disc.exc_velocity + 1
@@ -404,8 +406,8 @@ if __name__ == "__main__":
                 log("Exception: line {:10d}: Adsb rocd none".format(cnt+1))
             elif str(e) == "CrcKO":
                 disc.exc_crc_ko = disc.exc_crc_ko + 1
-                if disc.debug:
-                    log("Exception: line {:10d}: CRC check failure"
+                if _debug:
+                    log("debug exception: line {:10d}: CRC check failure"
                         .format(cnt+1))
             else:
                 log("Exception: line {:10d}: {:s} {:s}".

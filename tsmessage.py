@@ -1,15 +1,25 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+# (c) Kazansky137 - Tue May 19 17:33:30 UTC 2020
 
 from common import log, load_config
 
+_init_done = False
+_debug     = 0
+
 
 class TsMessage():
-    def __init__(self, _ts, _msg, _debug=0):
+    def __init__(self, _ts, _msg):
+        global _init_done
+        if not _init_done:
+            self.params = {}
+            load_config(self.params, "config/config.txt")
+            global _debug
+            _debug = 1 if self.params["arg_debug"] else 0
+            _init_done = True
+
         self.ts = float(_ts)
         self.msg = _msg
-        self.debug = _debug
         self.adsb = {}
         self.adsb['ts'] = _ts
         return
@@ -45,8 +55,8 @@ class TsMessage():
             speed = self.adsb['speed']
             head = self.adsb['head']
             rocd = self.adsb['rocd']
-            if self.debug:
-                log("debug: ", speed, head, rocd)
+            if _debug:
+                log("debug VH:", speed, head, rocd)
             fmt = "{:3s} {:15.9f} {:s} {:s} {:d} {:5.1f} {:d}"
             print(fmt.format
                   ("VH", ts, msg, icao, speed, head, rocd), flush=True)

@@ -1,4 +1,5 @@
 *.bak
+*.gz
 flights-*.txt
 log-*.txt
 txt-*.txt
