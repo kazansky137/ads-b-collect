@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
 
   debug=0
 
@@ -9,7 +9,10 @@
     exit
   }
 
-  while getopts "hfd" option; do
+  args_prd=""
+  args_prf=""
+
+  while getopts "hfdp" option; do
     case "${option}" in
         h)
             usage
@@ -18,8 +21,12 @@
             force=1
             ;;
         d)
-            debug=1
+            args_prd="-d"
+            args_prf="-d"
             ;;
+        p)
+            profile=1
+			;;
         *)
             usage
             ;;
@@ -51,9 +58,11 @@
   fi
 
 # Various output files
-  flgfile=flights-${BASH_REMATCH[2]}.txt
+  flgfile=flg-${BASH_REMATCH[2]}.txt
   runfile=log-${BASH_REMATCH[2]}.txt
   txtfile=txt-${BASH_REMATCH[2]}.txt 
+  prffile=prf-${BASH_REMATCH[2]}.bin
+  prdfile=prd-${BASH_REMATCH[2]}.bin
 
 if [ ! $force ]; then
 	if [ -e $flgfile ]; then
@@ -70,13 +79,28 @@ if [ ! $force ]; then
   		echo $0: file $txtfile is already existing
  	 	exit 1
 	fi
+
+	if [ -e $prdfile ]; then
+  		echo $0: file $prdfile is already existing
+ 	 	exit 1
+    fi
+
+	if [ -e $prffile ]; then
+  		echo $0: file $prffile is already existing
+ 	 	exit 1
+    fi
+fi
+
+if [ $profile ]; then
+	args_prd=$args_prd" --profile=$prdfile"
+	args_prf=$args_prf" --profile=$prffile"
 fi
 
 # Environment variable for nice justified colored output
   export TERM_COLS=$(tput cols)
 
-  $source | (./discover.py --live=0 --debug=$debug | tee $txtfile | \
-             ./flights-2-txt.py --live=0 --debug=$debug > $flgfile) 2> $runfile
-  touch -r $in_file $flgfile $runfile $txtfile
+  $source | (./discover.py --file $args_prd | tee $txtfile | \
+             ./flights-2-txt.py --file $args_prf > $flgfile) 2> $runfile
+  touch -r $in_file $flgfile $runfile $txtfile $prffile $prdfile
   
 exit

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sat May  2 17:10:56 UTC 2020
+# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
 
 import alert
 from common import log, distance, bearing, load_config
@@ -10,6 +10,7 @@ import signal
 from time import gmtime, strftime, time
 import importlib
 import traceback
+import cProfile
 icaocodes = importlib.import_module("icao-codes")
 
 
@@ -84,6 +85,9 @@ class FlightList():
         self.signal_hup = 1
 
     def __init__(self):
+        self.params = {}
+        load_config(self.params, "config/config.txt")
+
         self.list = []
         self.alerts = alert.AlertList()
 
@@ -220,6 +224,11 @@ if __name__ == "__main__":
 
     fl = FlightList()
 
+    if fl.params["arg_profile"]:
+        log("Profiling On")
+        pr = cProfile.Profile()
+        pr.enable()
+
     global cnt
     cnt = 0
     last_ct = 0
@@ -271,5 +280,9 @@ if __name__ == "__main__":
 
     log("Terminated: Processed {:>12,d} messages ({:5d} /s)"
         .format(cnt, int(cnt/(time() - init_ts))))
+
+    if fl.params["arg_profile"]:
+        pr.disable()
+        pr.dump_stats(fl.params["arg_profile"])
 
     sys.exit(0)

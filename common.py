@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
 
 import io
 import os
@@ -72,32 +72,45 @@ def load_config(_dict, _filename):
         f.close()
 
         parser = argparse.ArgumentParser()
-        parser.add_argument("--debug", help="Debug messages",
-                            type=int, choices=[0, 1])
-        parser.add_argument("--live", help="Live/File mode",
-                            type=int, choices=[1, 0])
-        parser.add_argument("--sms", help="Send SMS for urgent alert",
-                            type=int, choices=[1, 0])
-        parser.add_argument("--mail", help="Send mail for all alerts",
-                            type=int, choices=[1, 0])
-        parser.add_argument("--alerts", help="Manage alerts",
-                            type=int, choices=[1, 0])
+
+        parser.add_argument("-d", "--debug", action="store_true",
+                            help="debug mode (default off)")
+        parser.add_argument("-f", "--file",  action="store_true",
+                            help="file mode (default off)")
+        parser.add_argument("-a", "--alerts", action="store_true",
+                            help="manage alerts (default on)")
+        parser.add_argument("--noalerts", action="store_true",
+                            help="do not manage alerts")
+        parser.add_argument("-s", "--sms", action="store_true",
+                            help="send sms for urgent alert (default on)")
+        parser.add_argument("--nosms", action="store_true",
+                            help="do not send sms for urg. alert")
+        parser.add_argument("-m", "--mail", action="store_true",
+                            help="send mail for urgent alert (default on)")
+        parser.add_argument("--nomail", action="store_true",
+                            help="do not send mail for urg. alert")
+        parser.add_argument("--profile", type=str,
+                            help="dump profile data to file")
+
         args = parser.parse_args()
+        _dict["arg_debug"] = args.debug
+
         # Default values
-        # debug  = False
-        # live   = True	(if False: sms/mail/alerts = False - can be overwritten)
-        # sms    = True
-        # mail   = True
-        # alerts = True
-        _dict["arg_debug"]      = True if args.debug   == 1 else False
-        if args.live == 0:
-            _dict["arg_sms"]    = True if args.sms     == 1 else False
-            _dict["arg_mail"]   = True if args.mail    == 1 else False
-            _dict["arg_alerts"] = True if args.alerts  == 1 else False
+        # debug   = False
+        # file    = False (if True sms/mail/alerts = False, can be overwritten)
+        # sms     = True
+        # mail    = True
+        # alerts  = True
+        # profile = None
+        if not args.file:
+            _dict["arg_sms"]    = True if not args.nosms    else False
+            _dict["arg_mail"]   = True if not args.nomail   else False
+            _dict["arg_alerts"] = True if not args.noalerts else False
         else:
-            _dict["arg_sms"]    = False if args.sms    == 0 else True
-            _dict["arg_mail"]   = False if args.mail   == 0 else True
-            _dict["arg_alerts"] = False if args.alerts == 0 else True
+            _dict["arg_sms"]    = False if not args.sms    else True
+            _dict["arg_mail"]   = False if not args.mail   else True
+            _dict["arg_alerts"] = False if not args.alerts else True
+        _dict["arg_profile"] = args.profile
 
     return cnt
 

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue May 19 17:33:30 UTC 2020
+# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
 
 import sys
 import os
@@ -12,6 +12,7 @@ import traceback
 import signal
 import re
 from common import print_config
+import cProfile
 
 _debug = 0
 
@@ -335,6 +336,12 @@ if __name__ == "__main__":
     log("Running: Pid {:5d}".format(os.getpid()))
 
     disc = Discover()
+
+    if disc.params["arg_profile"]:
+        log("Profiling On")
+        pr = cProfile.Profile()
+        pr.enable()
+
     cnt = 0
     first_line = True
 
@@ -419,5 +426,9 @@ if __name__ == "__main__":
             log(traceback.format_exc())
 
     disc.logstats()
+
+    if disc.params["arg_profile"]:
+        pr.disable()
+        pr.dump_stats(disc.params["arg_profile"])
 
     sys.exit(0)

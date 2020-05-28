@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -67,4 +67,8 @@
 2020 May 11 22:45 : devout - 6cd7616 : Updated run-file.sh to run legacy files
 2020 May 11 23:01 ; master - 0da0578 : Merge branch 'devout' @6cd7616
 2020 May 12 23:04 ; devout - 4358121 : Added args, mail alerts live
-2020 May 14 19:29 ; devout -         : Added args, mgmt exceptions, bad perf.
+2020 May 14 19:29 ; devout - 019e5fb : Added args, mgmt exceptions, bad perf.
+2020 May 17 19:56 ; devout - 2dbbe67 : Bad perf corrected in tsmessage.py
+2020 May 19 19:33 : devout - 65cf456 : Improved performances for debug.
+2020 May 19 19:49 : master - 4c6c885 : Merge branch 'devout' @65cf456
+2020 May 28 06:21 : devprf -         : Improved args mgmt, added profiling

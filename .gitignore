@@ -3,6 +3,9 @@
 flights-*.txt
 log-*.txt
 txt-*.txt
+flg-*.txt
+prd-*.bin
+prf-*.bin
 messages-*.txt
 archives/
 trash/
