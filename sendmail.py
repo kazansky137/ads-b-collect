@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue May 12 21:29:57 UTC 2020
+# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
 
 import sys
 import os
@@ -8,24 +8,24 @@ from common import log, load_config
 
 import smtplib
 from email.message import EmailMessage
+params     = {}
+load_config(params, "config/config.txt")
 
 
 class SendMail():
 
     def __init__(self):
-        self.params = {}
-        load_config(self.params, "config/config.txt")
         pass
 
     def send(self, _subj, _msg):
-        if self.params["arg_mail"] is False:
+        if params["arg_mail"] is False:
             return
-        smtp = smtplib.SMTP(self.params["server"])
+        smtp = smtplib.SMTP(params["server"])
         msg = EmailMessage()
-        msg['From'] = self.params["from"]
-        msg['To'] = self.params["to"]
-        msg['Reply-To'] = self.params["reply"]
-        msg['Subject'] = self.params["pref"] + ": " + _subj
+        msg['From'] = params["from"]
+        msg['To'] = params["to"]
+        msg['Reply-To'] = params["reply"]
+        msg['Subject'] = params["pref"] + ": " + _subj
         msg.set_content(_msg)
         smtp.send_message(msg)
         smtp.quit()

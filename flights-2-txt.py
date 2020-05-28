@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
+# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
 
 import alert
 from common import log, distance, bearing, load_config
@@ -19,9 +19,6 @@ class Flight():
     def __init__(self, _ic, _ts, _sq=None, _cs=None,
                  _alt='0', _lat='0', _long='0',
                  _speed='0', _head='0', _rocd='0'):
-
-        self.params = {}
-        load_config(self.params, "config/config.txt")
 
         self.data = {'ic': _ic,         # Icao hex code
                      'fs': float(_ts),  # First seen
@@ -45,8 +42,8 @@ class Flight():
            (time() - self.data['ls']) > 120):
             return
 
-        lat_ref = float(self.params["lat"])
-        long_ref = float(self.params["long"])
+        lat_ref = float(params["lat"])
+        long_ref = float(params["long"])
         dist = 0.0
         bear = 0.0
         if self.pos['lat_ls'] != 0.0 and self.pos['long_ls'] != 0.0:
@@ -85,9 +82,6 @@ class FlightList():
         self.signal_hup = 1
 
     def __init__(self):
-        self.params = {}
-        load_config(self.params, "config/config.txt")
-
         self.list = []
         self.alerts = alert.AlertList()
 
@@ -210,6 +204,14 @@ class FlightList():
 
 if __name__ == "__main__":
 
+    params = {}
+    load_config(params, "config/config.txt")
+
+    if params["arg_profile"]:
+        log("Profiling On")
+        pr = cProfile.Profile()
+        pr.enable()
+
     def handler_alarm(_signum, _frame):
         global signal_alarm
         signal_alarm = 1
@@ -223,11 +225,6 @@ if __name__ == "__main__":
     log("Running: Pid {:5d}".format(os.getpid()))
 
     fl = FlightList()
-
-    if fl.params["arg_profile"]:
-        log("Profiling On")
-        pr = cProfile.Profile()
-        pr.enable()
 
     global cnt
     cnt = 0
@@ -281,8 +278,8 @@ if __name__ == "__main__":
     log("Terminated: Processed {:>12,d} messages ({:5d} /s)"
         .format(cnt, int(cnt/(time() - init_ts))))
 
-    if fl.params["arg_profile"]:
+    if params["arg_profile"]:
         pr.disable()
-        pr.dump_stats(fl.params["arg_profile"])
+        pr.dump_stats(params["arg_profile"])
 
     sys.exit(0)

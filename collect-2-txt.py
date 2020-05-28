@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Sun May 10 17:57:24 UTC 2020
+# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
 
 import sys
 import os
@@ -13,6 +13,9 @@ from time import time
 
 from pyModeS.extra.tcpclient import TcpClient
 from tsmessage import TsMessage
+
+params = {}
+load_config(params, "config/config.txt")
 
 
 class MyClient(TcpClient):
@@ -80,9 +83,6 @@ if __name__ == "__main__":
     atexit.register(handler_atexit)
 
     log("Running: Pid {:5d}".format(os.getpid()))
-
-    params = {}
-    load_config(params, "config/config.txt")
 
     host = params['addr']
     port = params['port']

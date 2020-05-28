@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
+# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
 
 import sys
 import os
@@ -14,7 +14,9 @@ import re
 from common import print_config
 import cProfile
 
-_debug = 0
+params = {}
+load_config(params, "config/config.txt")
+_debug = 1 if params["arg_debug"] else 0
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Light",  # 1 - Light < 15500 lbs
@@ -99,12 +101,6 @@ class Discover:
         self.signal_hup = 1
 
     def __init__(self):
-        self.params = {}
-        load_config(self.params, "config/config.txt")
-
-        global _debug
-        _debug = 1 if self.params["arg_debug"] else 0
-
         self.msgs_discovered = 0
 
         self.msgs_curr_rread = 0
@@ -200,8 +196,8 @@ class Discover:
             ret_dict['tc'] = tc
             self.tc[tc] = self.tc[tc] + 1
 
-            lat_ref = float(self.params["lat"])
-            long_ref = float(self.params["long"])
+            lat_ref = float(params["lat"])
+            long_ref = float(params["long"])
 
             if tc == 4:         # Aircraft identification
                 self.msgs_discovered = self.msgs_discovered + 1
@@ -335,12 +331,12 @@ class Discover:
 if __name__ == "__main__":
     log("Running: Pid {:5d}".format(os.getpid()))
 
-    disc = Discover()
-
-    if disc.params["arg_profile"]:
+    if params["arg_profile"]:
         log("Profiling On")
         pr = cProfile.Profile()
         pr.enable()
+
+    disc = Discover()
 
     cnt = 0
     first_line = True
@@ -354,15 +350,15 @@ if __name__ == "__main__":
                 raise ValueError("Invalid magic characters")
             if _debug:
                 log("debug first line:", result.group(1), result.group(2))
-            disc.params['in_vers'] = result.group(1)
-            disc.params['in_name'] = result.group(2)
-            if disc.params['in_vers'] == "%MBR24-3.0":
+            params['in_vers'] = result.group(1)
+            params['in_name'] = result.group(2)
+            if params['in_vers'] == "%MBR24-3.0":
                 word_one = 0
                 word_two = 1
-            elif disc.params['in_vers'] == "%MBR24-2.0":
+            elif params['in_vers'] == "%MBR24-2.0":
                 word_one = 1
                 word_two = 2
-            elif disc.params['in_vers'] == "%MBR24-1.0":
+            elif params['in_vers'] == "%MBR24-1.0":
                 word_one = 0
                 word_two = 1
             else:
@@ -427,8 +423,8 @@ if __name__ == "__main__":
 
     disc.logstats()
 
-    if disc.params["arg_profile"]:
+    if params["arg_profile"]:
         pr.disable()
-        pr.dump_stats(disc.params["arg_profile"])
+        pr.dump_stats(params["arg_profile"])
 
     sys.exit(0)

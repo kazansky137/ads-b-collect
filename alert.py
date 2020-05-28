@@ -1,13 +1,17 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
 
 from common import log, load, distance, bearing, load_config
 import sys
 import sendmail
 import ringring
 import importlib
+
 flightlist = importlib.import_module("flights-2-txt")
+params     = {}
+load_config(params, "config/config.txt")
+
 
 alert_cat = {'urg': ('yellow', 'red', 'blink'),
              'mil': ('red', 'green', 'bold'),
@@ -59,9 +63,6 @@ class AlertList():
         self.add(Alert('urg', 'sq', '7700', "General Emergency", 60))
 
     def __init__(self):
-        self.params = {}
-        load_config(self.params, "config/config.txt")
-
         self.list = []
         self.addpermanent()
         cnt = load(self, "config/alerts.txt", Alert)
@@ -83,7 +84,7 @@ class AlertList():
             alert.print(_file=_file)
 
     def check(self, fl):
-        if self.params["arg_alerts"] is False:
+        if params["arg_alerts"] is False:
             return
         # log("Check Flight ", fl.data, fl.pos)
         # Alert delayed waiting for position or least 16 messages
@@ -102,8 +103,8 @@ class AlertList():
                (alert.alert[1] == 'cs' and alert.alert[2] == fl.data['cs'])):
                 alert.fs = fl.data['ls']
                 # log("Matching   ", alert.message())
-                lat_ref = float(self.params["lat"])
-                long_ref = float(self.params["long"])
+                lat_ref = float(params["lat"])
+                long_ref = float(params["long"])
                 if fl.pos['lat_ls'] != 0.0 and fl.pos['long_ls'] != 0.0:
                     dist = distance(fl.pos['lat_ls'],
                                     fl.pos['long_ls'], lat_ref, long_ref)

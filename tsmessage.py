@@ -1,23 +1,16 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue May 19 17:33:30 UTC 2020
+# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
 
 from common import log, load_config
 
-_init_done = False
-_debug     = 0
+params     = {}
+load_config(params, "config/config.txt")
+_debug = 1 if params["arg_debug"] else 0
 
 
 class TsMessage():
     def __init__(self, _ts, _msg):
-        global _init_done
-        if not _init_done:
-            self.params = {}
-            load_config(self.params, "config/config.txt")
-            global _debug
-            _debug = 1 if self.params["arg_debug"] else 0
-            _init_done = True
-
         self.ts = float(_ts)
         self.msg = _msg
         self.adsb = {}
