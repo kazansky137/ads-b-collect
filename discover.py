@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
+# (c) Kazansky137 - Thu Jun  4 20:25:47 UTC 2020
 
 import sys
 import os
@@ -16,7 +16,7 @@ import cProfile
 
 params = {}
 load_config(params, "config/config.txt")
-_debug = 1 if params["arg_debug"] else 0
+_debug = 1 if params['arg_debug'] else 0
 
 ca_msg = ["None",   # 0 - No ADSB-Emitter
           "Light",  # 1 - Light < 15500 lbs
@@ -126,6 +126,7 @@ class Discover:
         self.exc_heading     = 0
         self.exc_rocd        = 0
         self.exc_crc_ko      = 0
+        self.exc_icao_null   = 0
         self.exc_other       = 0
 
         # Time counters
@@ -183,21 +184,23 @@ class Discover:
 
         # Do not manage messages with bad CRC
         if ret_dict['crc'] is not True:
-            raise ValueError("CrcKO")
+            raise ValueError("Exc_Crc_KO")
 
         dfmt = common.df(msg)
         ret_dict['dfmt'] = dfmt
         self.df[dfmt] = self.df[dfmt] + 1
 
         ret_dict['ic'] = common.icao(msg)
+        if ret_dict['ic'] == '000000':
+            raise ValueError("Exc_Icao_Null")
 
         if dfmt in [17, 18]:    # Downlink format 17 or 18
             tc = common.typecode(msg)
             ret_dict['tc'] = tc
             self.tc[tc] = self.tc[tc] + 1
 
-            lat_ref = float(params["lat"])
-            long_ref = float(params["long"])
+            lat_ref = float(params['lat'])
+            long_ref = float(params['long'])
 
             if tc == 4:         # Aircraft identification
                 self.msgs_discovered = self.msgs_discovered + 1
@@ -218,13 +221,13 @@ class Discover:
                 ret_dict['type'] = "VH"
                 _dict = adsb.velocity(msg)
                 if _dict is None:
-                    raise ValueError("AdsbVelocity")
+                    raise ValueError("Exc_Velocity_None")
                 (ret_dict['speed'], ret_dict['head'],
                  ret_dict['rocd'], var) = _dict
                 if ret_dict['head'] is None:
                     raise ValueError("AdsbHeading")
                 if ret_dict['rocd'] is None:
-                    raise ValueError("AdsbRocd")
+                    raise ValueError("Exc_Rocd_None")
             elif 20 <= tc <= 22:
                 self.msgs_discovered = self.msgs_discovered + 1
                 ret_dict['type'] = "LG"
@@ -246,7 +249,7 @@ class Discover:
 
         return ret_dict
 
-    def logstats(self):
+    def logstats(self, _prefix="Running"):
         # Time
         self.t_last = self.t_curr
         self.t_curr = time()
@@ -268,73 +271,78 @@ class Discover:
         self.msgs_last_len28 = self.msgs_curr_len28
         self.msgs_last_short = self.msgs_curr_short
 
-        log("Running   : Raw Read  {:>12,d} raw read ({:5d} /s)"
-            .format(self.msgs_last_rread, int(delta_rread)))
-        log("Running   : Raw Read  {:>12,d} messages ({:5d} /s)"
-            .format(self.msgs_last_total, int(delta_total)))
-        log("Running   : Raw Read  {:>12,d} msglen28 ({:5d} /s)"
-            .format(self.msgs_last_len28, int(delta_len28)))
-        log("Running   : Raw Read  {:>12,d} msgshort ({:5d} /s)"
-            .format(self.msgs_last_short, int(delta_short)))
+        log("{:10s} : Raw Read  {:>12,d} raw read ({:5d} /s)"
+            .format(_prefix, self.msgs_last_rread, int(delta_rread)))
+        log("{:10s} : Raw Read  {:>12,d} messages ({:5d} /s)"
+            .format(_prefix, self.msgs_last_total, int(delta_total)))
+        log("{:10s} : Raw Read  {:>12,d} msglen28 ({:5d} /s)"
+            .format(_prefix, self.msgs_last_len28, int(delta_len28)))
+        log("{:10s} : Raw Read  {:>12,d} msgshort ({:5d} /s)"
+            .format(_prefix, self.msgs_last_short, int(delta_short)))
 
-        log("Running   : Raw Read  {:>12,d} discovered"
-            .format(self.msgs_discovered))
+        log("{:10s} : Raw Read  {:>12,d} check ok"
+            .format(_prefix, self.parity_check_ok))
+        log("{:10s} : Raw Read  {:>12,d} check ko"
+            .format(_prefix, self.parity_check_ko))
 
-        log("Running   : Raw Read  {:>12,d} check ok"
-            .format(self.parity_check_ok))
-        log("Running   : Raw Read  {:>12,d} check ko"
-            .format(self.parity_check_ko))
+        log("{:10s} : Raw Read  {:>12,d} discovered"
+            .format(_prefix, self.msgs_discovered))
 
-        log("Running   : Raw Read  {:>12,d} exceptions resource unavailable"
-            .format(self.exc_unavailable))
-        log("Running   : Raw Read  {:>12,d} exceptions missing message"
-            .format(self.exc_missing))
-        log("Running   : Raw Read  {:>12,d} exceptions missing velocity      *"
-            .format(self.exc_velocity))
-        log("Running   : Raw Read  {:>12,d} exceptions missing heading       *"
-            .format(self.exc_heading))
-        log("Running   : Raw Read  {:>12,d} exceptions missing rocd          *"
-            .format(self.exc_rocd))
-        log("Running   : Raw Read  {:>12,d} exceptions crc ko                *"
-            .format(self.exc_crc_ko))
-        log("Running   : Raw Read  {:>12,d} exceptions other                 ?"
-            .format(self.exc_other))
+        log("{:10s} : Raw Read  {:>12,d} exceptions resource unavailable"
+            .format(_prefix, self.exc_unavailable))
+        log("{:10s} : Raw Read  {:>12,d} exceptions missing message"
+            .format(_prefix, self.exc_missing))
+        log("{:10s} : Raw Read  {:>12,d} exceptions missing velocity"
+            .format(_prefix, self.exc_velocity))
+        log("{:10s} : Raw Read  {:>12,d} exceptions missing heading"
+            .format(_prefix, self.exc_heading))
+        log("{:10s} : Raw Read  {:>12,d} exceptions missing rocd"
+            .format(_prefix, self.exc_rocd))
+        log("{:10s} : Raw Read  {:>12,d} exceptions crc ko"
+            .format(_prefix, self.exc_crc_ko))
+        log("{:10s} : Raw Read  {:>12,d} exceptions icao null"
+            .format(_prefix, self.exc_icao_null))
+        log("{:10s} : Raw Read  {:>12,d} exceptions unknown"
+            .format(_prefix, self.exc_other))
 
         s = 0
         for i in range(len(self.df)):
             v = self.df[i]
             if v > 0:
                 s = s + v
-                log("Running   : Raw Read  {:>12,d} dfmt[{:2d}] {:s}"
-                    .format(v, i, df_msg[i]))
-        log("Running   : Raw Read  {:>12,d} df cnt".format(s))
+                log("{:10s} : Raw Read  {:>12,d} dfmt[{:2d}] {:s}"
+                    .format(_prefix, v, i, df_msg[i]))
+        log("{:10s} : Raw Read  {:>12,d} df cnt".format(_prefix, s))
 
         s = 0
         for i in range(len(self.tc)):
             v = self.tc[i]
             if v > 0:
                 s = s + v
-                log("Running   : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
-                    .format(v, i, tc_msg[i-1]))
-        log("Running   : Raw Read  {:>12,d} tc17/18 cnt".format(s))
+                log("{:10s} : Raw Read  {:>12,d} tc17[{:2d}] {:s}"
+                    .format(_prefix, v, i, tc_msg[i-1]))
+        log("{:10s} : Raw Read  {:>12,d} tc17/18 cnt".format(_prefix, s))
 
         s = 0
         for i in range(len(self.ca)):
             v = self.ca[i]
             if v > 0:
                 s = s + v
-                log("Running   : Raw Read  {:>12,d} ca[{:2d}] {:s}"
-                    .format(v, i, ca_msg[i]))
-        log("Running   : Raw Read  {:>12,d} ca cnt".format(s))
+                log("{:10s} : Raw Read  {:>12,d} ca[{:2d}] {:s}"
+                    .format(_prefix, v, i, ca_msg[i]))
+        log("{:10s} : Raw Read  {:>12,d} ca cnt".format(_prefix, s))
 
 
 if __name__ == "__main__":
-    log("Running: Pid {:5d}".format(os.getpid()))
+    log("Starting   : Pid {:5d}".format(os.getpid()))
 
-    if params["arg_profile"]:
-        log("Profiling On")
+    if params['arg_profile']:
+        log("Starting   : Profiling On")
         pr = cProfile.Profile()
         pr.enable()
+
+    if params['arg_output'] == "raw":
+        print(params['vers'], params['name'])
 
     disc = Discover()
 
@@ -348,8 +356,7 @@ if __name__ == "__main__":
             result = regex.match(line)
             if result is None:
                 raise ValueError("Invalid magic characters")
-            if _debug:
-                log("debug first line:", result.group(1), result.group(2))
+            log("Starting   : Magic line", result.group(1), result.group(2))
             params['in_vers'] = result.group(1)
             params['in_name'] = result.group(2)
             if params['in_vers'] == "%MBR24-3.0":
@@ -379,9 +386,15 @@ if __name__ == "__main__":
             ts_msg = TsMessage(words[word_one], words[word_two])
             ret_dict = disc.message(words[word_two])
             if ret_dict['ret'] == 0:
-                ts_msg.disc(ret_dict)
-                # ts_msg.print()
-                ts_msg.print_legacy()
+                if params['arg_icao'] is None or \
+                   params['arg_icao'] == ret_dict['ic']:
+                    ts_msg.disc(ret_dict)
+                    if params['arg_output'] == "legacy":
+                        ts_msg.print_legacy()
+                    elif params['arg_output'] == "raw":
+                        ts_msg.print_raw()
+                    elif params['arg_output'] == "json":
+                        ts_msg.print()
 
         except IndexError as e:
             if len(words) == 1:
@@ -398,22 +411,26 @@ if __name__ == "__main__":
                 if _debug:
                     log("debug exception: line {:10d}: Resource unavailable"
                         .format(cnt+1))
-            elif str(e) == "AdsbVelocity":
+            elif str(e) == "Exc_Velocity_None":
                 disc.exc_velocity = disc.exc_velocity + 1
-                log("Exception: line {:10d}: Adsb velocity none".format(cnt+1))
+                log("Exception  : Line {:17d}: Velocity none".format(cnt+1))
             elif str(e) == "AdsbHeading":
                 disc.exc_heading = disc.exc_heading + 1
-                log("Exception: line {:10d}: Adsb heading none".format(cnt+1))
-            elif str(e) == "AdsbRocd":
+                log("Exception  : Line {:10d}: Adsb heading none".format(cnt+1))
+            elif str(e) == "Exc_Rocd_None":
                 disc.exc_rocd = disc.exc_rocd + 1
-                log("Exception: line {:10d}: Adsb rocd none".format(cnt+1))
-            elif str(e) == "CrcKO":
+                log("Exception  : Line {:17d}: Rocd None".format(cnt+1))
+            elif str(e) == "Exc_Crc_KO":
                 disc.exc_crc_ko = disc.exc_crc_ko + 1
                 if _debug:
-                    log("debug exception: line {:10d}: CRC check failure"
-                        .format(cnt+1))
+                    log("Exception  : Line {:17d} Crc KO Debug".format(cnt+1))
+            elif str(e) == "Exc_Icao_Null":
+                disc.exc_icao_null = disc.exc_icao_null + 1
+                if _debug:
+                    log("Exception  : Line {:17d} Icao Null".format(cnt+1))
             else:
-                log("Exception: line {:10d}: {:s} {:s}".
+                disc.exc_other = disc.exc_other + 1
+                log("Exception  : Line {:17d} {:s} {:s}".
                     format(cnt+1, str(type(e)), str(e)))
         except Exception as e:
             disc.exc_other = disc.exc_other + 1
@@ -421,10 +438,10 @@ if __name__ == "__main__":
                 format(cnt+1, str(type(e)), str(e)))
             log(traceback.format_exc())
 
-    disc.logstats()
+    disc.logstats("Terminated")
 
-    if params["arg_profile"]:
+    if params['arg_profile']:
         pr.disable()
-        pr.dump_stats(params["arg_profile"])
+        pr.dump_stats(params['arg_profile'])
 
     sys.exit(0)

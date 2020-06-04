@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
+# (c) Kazansky137 - Thu Jun  4 20:25:47 UTC 2020
 
 import alert
 from common import log, distance, bearing, load_config
@@ -107,8 +107,9 @@ class FlightList():
             self.print(_file=sys.stderr)
             sys.stderr.flush()
 
-        if _ic == '000000':
-            return
+#       if _ic == '000000':
+#           log("Detected no ICAO !")
+#           return
 
         for flx in self.list:
             if flx.data['ic'] == _ic:
@@ -208,7 +209,7 @@ if __name__ == "__main__":
     load_config(params, "config/config.txt")
 
     if params["arg_profile"]:
-        log("Profiling On")
+        log(" Starting   : Profiling On")
         pr = cProfile.Profile()
         pr.enable()
 
@@ -222,7 +223,7 @@ if __name__ == "__main__":
     period_alarm = 3600
     signal.alarm(period_alarm)
 
-    log("Running: Pid {:5d}".format(os.getpid()))
+    log(" Starting   : Pid {:5d}".format(os.getpid()))
 
     fl = FlightList()
 
@@ -242,7 +243,7 @@ if __name__ == "__main__":
 
             dm = cnt - last_ct
             dt = time() - last_ts
-            log("Running   : Processed {:>12,d} messages ({:5d} /s)"
+            log(" Running    : Processed {:>12,d} messages ({:5d} /s)"
                 .format(cnt, int(dm/dt)))
             last_ct = cnt
             last_ts = time()
@@ -263,7 +264,7 @@ if __name__ == "__main__":
                                  _head=words[5], _rocd=words[6])
 
         except Exception as e:
-            log("Exception:", e)
+            log("Exception  :", e)
             log(words)
             log(line)
 
@@ -272,10 +273,10 @@ if __name__ == "__main__":
     nmsgs = fl.print()
 
     if nmsgs != cnt:
-        log("Terminated: Warning {:>12,d} cnt != {:>12,d} nmsgs"
+        log(" Terminated : Warning   {:>12,d} cnt != {:>12,d} nmsgs"
             .format(cnt, nmsgs))
 
-    log("Terminated: Processed {:>12,d} messages ({:5d} /s)"
+    log(" Terminated : Processed {:>12,d} messages ({:5d} /s)"
         .format(cnt, int(cnt/(time() - init_ts))))
 
     if params["arg_profile"]:

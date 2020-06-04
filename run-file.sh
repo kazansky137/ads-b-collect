@@ -1,6 +1,6 @@
 #! /bin/bash
 
-# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
+# (c) Kazansky137 - Thu Jun  4 20:25:47 UTC 2020
 
   debug=0
 
@@ -47,10 +47,11 @@
 
   regname="^[[:alnum:]]+"
   regtime="[0-9]{6}-[0-9]{6}"
+  regicao="[0-9A-Z]{6}"
 
-  if [[ $in_name =~ ($regname)-($regtime).txt$ ]]; then
+  if [[ $in_name =~ ($regname)-($regtime)((-$regicao)*).txt$ ]]; then
     source="cat $in_file"
-  elif [[ $in_name =~ ($regname)-($regtime).txt.gz$ ]]; then
+  elif [[ $in_name =~ ($regname)-($regtime)((-$regicao)*).txt.gz$ ]]; then
     source="gzip -dcf $in_file"
   else
     echo $0: bad filename structure
@@ -58,11 +59,11 @@
   fi
 
 # Various output files
-  flgfile=flg-${BASH_REMATCH[2]}.txt
-  runfile=log-${BASH_REMATCH[2]}.txt
-  txtfile=txt-${BASH_REMATCH[2]}.txt 
-  prffile=prf-${BASH_REMATCH[2]}.bin
-  prdfile=prd-${BASH_REMATCH[2]}.bin
+  flgfile=flg-${BASH_REMATCH[2]}${BASH_REMATCH[3]}.txt
+  runfile=log-${BASH_REMATCH[2]}${BASH_REMATCH[3]}.txt
+  txtfile=txt-${BASH_REMATCH[2]}${BASH_REMATCH[3]}.txt 
+  prffile=prf-${BASH_REMATCH[2]}${BASH_REMATCH[3]}.bin
+  prdfile=prd-${BASH_REMATCH[2]}${BASH_REMATCH[3]}.bin
 
 if [ ! $force ]; then
 	if [ -e $flgfile ]; then
@@ -101,6 +102,10 @@ fi
 
   $source | (./discover.py --file $args_prd | tee $txtfile | \
              ./flights-2-txt.py --file $args_prf > $flgfile) 2> $runfile
-  touch -r $in_file $flgfile $runfile $txtfile $prffile $prdfile
+touch -r $in_file $flgfile $runfile $txtfile
   
+if [ $profile ]; then
+	touch -r $in_file $prffile $prdfile
+fi
+
 exit

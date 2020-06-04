@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 28 04:21:26 UTC 2020
+# (c) Kazansky137 - Thu Jun  4 20:25:47 UTC 2020
 
 import io
 import os
@@ -84,13 +84,18 @@ def load_config(_dict, _filename):
         parser.add_argument("-s", "--sms", action="store_true",
                             help="send sms for urgent alert (default on)")
         parser.add_argument("--nosms", action="store_true",
-                            help="do not send sms for urg. alert")
+                            help="do not send sms for urgent alert")
         parser.add_argument("-m", "--mail", action="store_true",
                             help="send mail for urgent alert (default on)")
         parser.add_argument("--nomail", action="store_true",
-                            help="do not send mail for urg. alert")
+                            help="do not send mail for urgent alert")
         parser.add_argument("--profile", type=str,
                             help="dump profile data to file")
+        parser.add_argument("--icao", type=str, default=None,
+                            help="icao hex code of plane to filter")
+        parser.add_argument("--output", type=str,
+                            choices=["json", "raw", "legacy"], default="legacy",
+                            help="output format")
 
         args = parser.parse_args()
         _dict["arg_debug"] = args.debug
@@ -102,6 +107,8 @@ def load_config(_dict, _filename):
         # mail    = True
         # alerts  = True
         # profile = None
+        # icao    = None
+        # output  = legacy
         if not args.file:
             _dict["arg_sms"]    = True if not args.nosms    else False
             _dict["arg_mail"]   = True if not args.nomail   else False
@@ -111,6 +118,8 @@ def load_config(_dict, _filename):
             _dict["arg_mail"]   = False if not args.mail   else True
             _dict["arg_alerts"] = False if not args.alerts else True
         _dict["arg_profile"] = args.profile
+        _dict["arg_icao"]    = args.icao
+        _dict["arg_output"]  = args.output
 
     return cnt
 

@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 28 20:49:27 UTC 2020
+# (c) Kazansky137 - Thu Jun  4 20:25:47 UTC 2020
 
 from common import log, load, distance, bearing, load_config
 import sys
@@ -66,15 +66,14 @@ class AlertList():
         self.list = []
         self.addpermanent()
         cnt = load(self, "config/alerts.txt", Alert)
-        log("Loaded {:3d} alerts".format(cnt))
+        log(" Starting   : Loaded {:3d} alerts".format(cnt))
 
     def reload(self):
-        log("Clearing alerts")
+        log(" Updating   : Clearing alerts")
         self.list.clear()
-        log("Done")
         self.addpermanent()
         cnt = load(self, "config/alerts.txt", Alert)
-        log("Loaded {:3d} alerts".format(cnt))
+        log(" Updating   : Loaded {:3d} alerts".format(cnt))
 
     def add(self, _alert):
         self.list.append(_alert)

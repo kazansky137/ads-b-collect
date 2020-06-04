@@ -7,6 +7,7 @@ flg-*.txt
 prd-*.bin
 prf-*.bin
 messages-*.txt
+msg-*.txt
 archives/
 trash/
 aircrafts/
