@@ -1,13 +1,14 @@
 *.bak
 *.gz
+*.csv
 flights-*.txt
 log-*.txt
 txt-*.txt
 messages-*.txt
 archives/
 trash/
-aircrafts/
 config/alerts.txt
 tests/
 config/config*.txt
+*.csv
 __pycache__/
