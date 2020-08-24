@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sun Jun 14 17:41:22 CEST 2020
+# (c) Kazansky137 - Mon Aug 24 20:01:20 CEST 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -74,4 +74,5 @@
 2020 May 28 06:21 : devprf - 3a21246 : Improved args mgmt, added profiling
 2020 May 28 22:57 : devprf - 700702c : Improved load_config and _debug handling
 2020 Jun 04 22:49 : devprf - d55b595 : Improved args, exceptions + filter planes
-2020 Jun 14 17:42 : master - ....... : Added aircrafts db doanloads.
+2020 Jun 14 17:42 : master - 53a8a3e : Added aircrafts db download.
+2020 Aug 24       : master - ....... : Use last-log, removed mail opt. Added v. %MBR24-3.1

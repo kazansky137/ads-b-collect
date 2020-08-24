@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Tue May 19 17:33:30 UTC 2020
+# (c) Kazansky137 - Mon Aug 24 20:01:20 CEST 2020
 
 import sys
 import os
@@ -341,7 +341,7 @@ if __name__ == "__main__":
     for line in sys.stdin:
         if first_line:
             first_line = False
-            regex = re.compile('(%MBR24-[1-3].0) ([A-Z\-]+)$')
+            regex = re.compile('(%MBR24-[1-3].[0-9]) ([A-Z\-]+)$')
             result = regex.match(line)
             if result is None:
                 raise ValueError("Invalid magic characters")
@@ -349,7 +349,10 @@ if __name__ == "__main__":
                 log("debug first line:", result.group(1), result.group(2))
             disc.params['in_vers'] = result.group(1)
             disc.params['in_name'] = result.group(2)
-            if disc.params['in_vers'] == "%MBR24-3.0":
+            if disc.params['in_vers'] == "%MBR24-3.1":
+                word_one = 0
+                word_two = 1
+            elif disc.params['in_vers'] == "%MBR24-3.0":
                 word_one = 0
                 word_two = 1
             elif disc.params['in_vers'] == "%MBR24-2.0":

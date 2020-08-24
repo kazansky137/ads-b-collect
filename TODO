@@ -1,23 +1,35 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sat May  9 21:27:18 UTC 2020
+# (c) Kazansky137 - Mon Aug 24 20:01:20 CEST 2020
 
 General
 -------
+Collect : should print longitude latitude with magic characters
+
 Alerting : Should add alert for missing flights after some delay.
 Alerting : Should add media like Telegram or mobile app.
 Alerting : Should print heading
+
+Alerting : Should send alert for flights with heading & bearing
+           indicates flights going to GBX stations. 
 
 Config : Should validate config files (e.g. ';' instead of ':', case of letters)
 Config : Should manage to reload line icao-tail.txt
 
 General : Should check statistics consistency
 General : Should manage speed
+General : For stats add percentage
+
+General : Do not print too many consecutives exceptions
+
+Common : manage exclusive options
+
+Discovery : Print icao code in exceptions if available
 
 flights-2-txt.py
 ----------------
-Flight:			Should handle minimum and maximum distance
-addupd_flight:	Should adapt filter for altitude to sliding window
+Flight:         Should handle minimum and maximum distance
+addupd_flight:  Should adapt filter for altitude to sliding window
 
 common.py
 ---------

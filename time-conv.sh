@@ -1,7 +1,7 @@
 :
 
-# (c) Kazansky137 - Tue Apr 21 17:00:21 UTC 2020
+# (c) Kazansky137 - Mon Aug 24 20:01:20 CEST 2020
 
-  date --date="@$1"
+  date --utc --date="@$1"
 
 exit

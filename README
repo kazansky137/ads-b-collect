@@ -1,9 +1,16 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Sat Dec  7 22:53:15 CET 2019
+# (c) Kazansky137 - Mon Aug 24 20:01:20 CEST 2020
 
-Collect messages from ADS-B 
----------------------------
+Credits and technical details follows later in this file.
+I would like to emphasize on this software on a practical
+point of view, I mean how to use it.
+
+Manual
+------
+
+Collect and analyze ADS-B messages and related
+----------------------------------------------
 
 This work is greatly based on the library "pyModeS" of Junzi Sun.
 
