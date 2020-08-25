@@ -1,6 +1,6 @@
 # ads-b-collect
 
-# (c) Kazansky137 - Tue Aug 25 20:17:44 UTC 2020
+# (c) Kazansky137 - Tue Aug 25 20:28:24 UTC 2020
 
 2019 Dec 07 22:53 : master - 0026e17 : Initial release
 2019 Dec 10 22:43 : devout - 3e66357 : Improved colored output
@@ -77,4 +77,5 @@
 2020 Jun 14 17:42 : master - 53a8a3e : Added aircrafts db download.
 2020 Aug 24 20:01 : master - 2205fd4 : Use last-log, removed mail opt. Added v. %MBR24-3.1
 2020 Aug 25 19:43 : devout - 5606ce6 : Merge branch 'master' @2205fd4
-2020 Aug 25 22:17 : devout - ....... : Bug corrected with xterm font 9x15
+2020 Aug 25 22:17 : devout - b7cb74e : Bug corrected with xterm font 9x15
+2020 Aug 25 ..:.. : master - ....... : Merge branch 'devout' @b7cb74e
