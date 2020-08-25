@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 
-# (c) Kazansky137 - Thu May 14 17:29:37 UTC 2020
+# (c) Kazansky137 - Tue Aug 25 20:17:44 UTC 2020
 
 import io
 import os
@@ -137,7 +137,7 @@ def xt_set(_fg='black', _bg=None, _st=None, _file=sys.stdout):
         xt_line_del = 0
 
     try:
-        xt_line_max = int(os.environ['TERM_COLS'])
+        xt_line_max = int(os.environ['TERM_COLS']) - 1
     except KeyError:
         xt_line_max = 120
 
