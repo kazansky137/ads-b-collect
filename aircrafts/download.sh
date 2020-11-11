@@ -1,12 +1,11 @@
 #! /bin/bash
 
-# (c) Kazansky137 - Mon Aug 24 20:01:20 CEST 2020
+# (c) Kazansky137 - Tue Sep  1 13:41:19 CEST 2020
 
-# 14  7 * * * $HOME/ads-b-collect/aircrafts/download.sh
+# 15 19 * * * $HOME/ADS-B/00-prod-collect/aircrafts/download.sh
 
 # set -x
-
-  cd $HOME/ads-b-collect/aircrafts
+  cd $HOME/ADS-B/00-prod-collect/aircrafts
   BASE=https://opensky-network.org/datasets/metadata
 
   (  curl -s -O $BASE/aircraftDatabase.csv
