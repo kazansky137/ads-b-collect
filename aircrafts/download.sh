@@ -13,7 +13,7 @@
      curl -s -O $BASE/doc8643Manufacturers.csv
      ls -l *.csv
      scp -rp aircraftDatabase.csv \
-		nina@10.0.0.32:iCloud/Documents/Belradar24/20-aircraft-db/
+		mort@10.0.0.32:Documents/Belradar24/20-aircraft-db/
   ) | mail -s "[/adsb] download" info@belradar24.be
 
 exit
